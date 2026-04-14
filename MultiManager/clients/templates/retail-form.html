@@ -1,0 +1,12 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<h2>Retail Onboarding</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}
