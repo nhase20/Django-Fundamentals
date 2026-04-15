@@ -1,9 +1,21 @@
 {% extends 'home.html' %}
 
 {% block content %}
-<h1>Welcome</h1>
+<h1>Investment Manager</h1>
 
+<!-- <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Log In</button>
+</form> -->
+
+<h3>For new Users</h3>
 <a href="/onboarding/retail/">Retail Client</a>
+<p>Receive simple, guided investment plans tailored to your goals and risk level with minimal
+control over detailed decisions.</p>
 <a href="/onboarding/institutional/">Institutional Client</a>
+<p>Our trust that you will receive fully customised investment strategies with detailed control over risk, benchmarks,
+asset allocation, and manager selection.</p>
 
+<h4>About us</h4>
 {% endblock %}

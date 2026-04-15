@@ -74,6 +74,18 @@ class InstitutionalClient(models.Model):
     liquidity = models.CharField(max_length=20, choices= LIQUIDITY_REQUIREMENTS)
     manager_numbers = models.PositiveIntegerField(max_length=3)
     time_horizon = models.IntegerField()
-    
+
     def __str__(self):
         return self.name
+
+class Portfolio(models.Model):
+    retail_client = models.OneToOneField(RetailClient,on_delete=models.CASCADE)
+
+    institutional_client = models.OneToOneField(InstitutionalClient,on_delete=models.CASCADE)
+    total_value = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Asset(models.Model):
+    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    asset_type = models.CharField(max_length=50)  # stocks, bonds
+    percentage = models.FloatField()

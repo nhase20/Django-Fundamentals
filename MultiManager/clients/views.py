@@ -32,3 +32,6 @@ def retail_dashboard(request):
 
 def institutional_dashboard(request):
     return render(request, 'institutional-dashboard.html')
+
+def create_portfolio(client):
+    return 
