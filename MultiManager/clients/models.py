@@ -1,4 +1,5 @@
 from django.db import models
+from .automations import classify_retailer, classify_institution
 
 class RetailClient(models.Model):
     INVESTMENT_GOALS = [
@@ -8,20 +9,26 @@ class RetailClient(models.Model):
     ]
 
     RISK_TOLERANCE = [
-        ('conservative','Conservative'),
-        ('aggressive','Aggressive'), 
-        ('moderate','Moderate'),
+        (1, 'Poor'),
+        (2, 'Fair'),
+        (3, 'Good'),
+        (4, 'Very Good'),
+        (5, 'Excellent'),
     ]
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100,default="user")
     email = models.EmailField()
     client_goals = models.CharField(max_length=20, choices=INVESTMENT_GOALS)
     age = models.PositiveIntegerField(max_length=3)
-    risk_tolerance = models.CharField(max_length=20, choices= RISK_TOLERANCE)
+    risk_tolerance = models.IntegerField(max_length=20, choices= RISK_TOLERANCE)
     investment_goal = models.CharField(max_length=100)
     time_horizon = models.PositiveBigIntegerField()
     identity_number = models.PositiveBigIntegerField(max_length=13)
-
+    
+    @property
+    def risk_profile(self):
+        return classify_retailer(self)
+    
     def __str__(self):
         return self.name
 
@@ -71,6 +78,7 @@ class InstitutionalClient(models.Model):
     ]
 
     # About company
+    organization_name = models.CharField(max_length=100, default="org")
     organization_type = models.CharField(max_length=20, choices=ORGANIZATION_TYPE)
     assets_held = models.PositiveBigIntegerField()
     # Aims and objectives
@@ -83,8 +91,12 @@ class InstitutionalClient(models.Model):
     manager_numbers = models.PositiveIntegerField(max_length=3)
     time_horizon = models.IntegerField()
 
+    @property
+    def tier(self):
+        return classify_institution(self)
+
     def __str__(self):
-        return self.name
+        return self.organization_name
 
 class Portfolio(models.Model):
     

@@ -5,8 +5,8 @@
 <h3>Welcome {{ client.name }}</h3>
 
 <h2>Portfolio Value</h2>
-<p>R {{ portfolio.total_value }}</p>
-
+<p>Amount invested: R {{ portfolio.total_value }}</p>
+<h3>Risk Profile: {{ client.risk_profile }}</h3>
 <h2>Assets</h2>
 
 {% for asset in assets %}
