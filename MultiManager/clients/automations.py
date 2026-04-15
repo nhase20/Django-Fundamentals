@@ -85,3 +85,92 @@ def classify_institution(client):
         return "Tier 2  (Balanced Institution)"
     else:
         return "Tier 3 (Large/Complex Institution)"
+    
+def retail_benchmark_selector(client):
+    
+    risk = client.risk_profile
+    horizon = client.time_horizon
+    age = client.age
+    goal = client.client_goals
+
+    if risk == "Aggressive":
+        
+        # Long horizon → high growth tech
+        if horizon >= 10:
+            return "Nasdaq-100"
+        
+        # Younger + aggressive → small cap growth
+        if age < 35:
+            return "Russell 2000"
+        
+        return "S&P 500"
+
+    elif risk == "Balanced":
+        
+        # Want global diversification
+        if goal == "independence":
+            return "MSCI World Index"
+        
+        # Medium horizon → balanced US exposure
+        if horizon >= 5:
+            return "S&P 500"
+        
+        return "Dow Jones Industrial Average (DJIA)"
+
+    elif risk == "Conservative":
+        
+        # Wealth preservation → stable companies
+        if goal == "preservation":
+            return "Dow Jones Industrial Average (DJIA)"
+        
+        # Older investors → less volatility
+        if age >= 50:
+            return "MSCI World Index"
+        
+        return "S&P 500"
+
+    # fallback
+    return "S&P 500"
+
+def select_institutional_benchmark(client):
+
+    objective = client.return_objective.strip()
+    risk = client.risk_tolerance
+    liquidity = client.liquidity
+    performance = client.performance
+    tier = client.tier  
+
+    if objective == "income":
+        return "Bond Index"
+
+    if objective == "capital":
+        if risk == "aggressive":
+            return "S&P 500"
+        else:
+            return "Multi-Asset Benchmark"
+
+    if objective == "total":
+
+        # Tier-based refinement
+        if "Tier 3" in tier:
+            return "Multi-Asset Benchmark"
+
+        if risk == "aggressive":
+            return "S&P 500"
+
+        return "Multi-Asset Benchmark"
+
+    if performance == "outperforn":
+        return "S&P 500"
+
+    if performance == "minimize":
+        return "Bond Index"
+
+    if liquidity == "high":
+        return "S&P 500"  # liquid markets
+
+    if liquidity == "low":
+        return "Multi-Asset Benchmark"
+
+    # fallback
+    return "Custom Benchmark"

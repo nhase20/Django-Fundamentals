@@ -1,5 +1,5 @@
 from django.db import models
-from .automations import classify_retailer, classify_institution
+from .automations import classify_retailer, classify_institution, retail_benchmark_selector, select_institutional_benchmark
 
 class RetailClient(models.Model):
     INVESTMENT_GOALS = [
@@ -19,15 +19,19 @@ class RetailClient(models.Model):
     name = models.CharField(max_length=100,default="user")
     email = models.EmailField()
     client_goals = models.CharField(max_length=20, choices=INVESTMENT_GOALS)
-    age = models.PositiveIntegerField(max_length=3)
-    risk_tolerance = models.IntegerField(max_length=20, choices= RISK_TOLERANCE)
+    age = models.PositiveIntegerField()
+    risk_tolerance = models.IntegerField( choices= RISK_TOLERANCE)
     investment_goal = models.CharField(max_length=100)
     time_horizon = models.PositiveBigIntegerField()
-    identity_number = models.PositiveBigIntegerField(max_length=13)
+    identity_number = models.PositiveBigIntegerField()
     
     @property
     def risk_profile(self):
         return classify_retailer(self)
+    
+    @property
+    def benchmark (self):
+        return retail_benchmark_selector(self)
     
     def __str__(self):
         return self.name
@@ -47,12 +51,12 @@ class InstitutionalClient(models.Model):
         ('total ','Total Return'),
     ]
 
-    BENCHMARK = [
-        ('s&p 500','S&P 500'),
-        ('bond index','Bond index'),
-        ('multi-asset','Multi-asset benchmark'),
-        ('custom','Custom'),
-    ]
+    # BENCHMARK = [
+    #     ('s&p 500','S&P 500'),
+    #     ('bond index','Bond index'),
+    #     ('multi-asset','Multi-asset benchmark'),
+    #     ('custom','Custom'),
+    # ]
 
     # The portfolio's performance relative to the benchmark
     PERFORMANCE_REL_BENCHMARK = [
@@ -84,7 +88,7 @@ class InstitutionalClient(models.Model):
     # Aims and objectives
     target_return = models.PositiveSmallIntegerField(max_length=3,default=0)
     return_objective = models.CharField(max_length=20, choices=RETURN_OBJECTIVE)
-    benchmark =  models.CharField(max_length=20, choices= BENCHMARK)
+    #benchmark =  models.CharField(max_length=20, choices= BENCHMARK)
     performance = models.CharField(max_length=20, choices= PERFORMANCE_REL_BENCHMARK)
     risk_tolerance = models.CharField(max_length=20, choices= RISK_TOLERANCE)
     liquidity = models.CharField(max_length=20, choices= LIQUIDITY_REQUIREMENTS)
@@ -95,6 +99,10 @@ class InstitutionalClient(models.Model):
     def tier(self):
         return classify_institution(self)
 
+    @property
+    def benchmark(self):
+        return select_institutional_benchmark(self)
+    
     def __str__(self):
         return self.organization_name
 
