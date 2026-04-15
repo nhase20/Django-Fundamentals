@@ -2,6 +2,23 @@
 
 {% block content %}
 <h1>Retail Dashboard</h1>
+<h3>Welcome {{ client.name }}</h3>
+
+<h2>Portfolio Value</h2>
+<p>R {{ portfolio.total_value }}</p>
+
+<h2>Assets</h2>
+
+{% for asset in assets %}
+<div class="card">
+    <h3>{{ asset.name }}</h3>
+    <p>Type: {{ asset.asset_type }}</p>
+    <p>Value: R {{ asset.value }}</p>
+    <p>Allocation: {{ asset.allocation_percentage }}%</p>
+</div>
+{% empty %}
+<p>No assets yet</p>
+{% endfor %}
 <p>Image on top</p>
 <p>navigation bar in the midddle with a simple summary view</p>
 <p>a few action buttons</p>

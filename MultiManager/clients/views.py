@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import RetailClientForm, InstitutionalClientForm
+from .models import RetailClient, Portfolio, AssetManaged, InstitutionalClient
 
 def home(request):
     return render(request, 'login.html')
@@ -16,22 +17,37 @@ def onboarding(request, client_type):
         if form.is_valid():
             client = form.save()
 
-            if client.client_type == 'retail':
-                return redirect('retail-dashboard')
+            if client_type == 'retail':
+                return redirect('retail-dashboard', client_id=client.id)
             else:
-                return redirect('institutional-dashboard')
+                return redirect('institutional-dashboard', client_id=client.id)
     else:
         form = FormClass(initial={'client_type': client_type})
 
     return render(request, 'retail-form.html' if client_type == 'retail' else 'institutional-form.html', {'form': form})
 
+def retail_dashboard(request, client_id):
 
-def retail_dashboard(request):
-    return render(request, 'retail-dashboard.html')
+    client = RetailClient.objects.get(id=client_id)
+    portfolio, created = Portfolio.objects.get_or_create(retail_client=client)
+    assets = AssetManaged.objects.filter(portfolio=portfolio)
 
+    context = {
+        'client': client,
+        'portfolio': portfolio,
+        'assets': assets
+    }
+    return render(request, 'retail-dashboard.html', context)
 
-def institutional_dashboard(request):
-    return render(request, 'institutional-dashboard.html')
+def institutional_dashboard(request, client_id):
 
-def create_portfolio(client):
-    return 
+    client = InstitutionalClient.objects.get(id=client_id)
+    portfolio, created = Portfolio.objects.get_or_create(retail_client=client)
+    assets = AssetManaged.objects.filter(portfolio=portfolio)
+    context = {
+        'client': client,
+        'portfolio': portfolio,
+        'assets': assets
+    }
+
+    return render(request, 'institutional-dashboard.html', context)

@@ -7,13 +7,19 @@ class RetailClient(models.Model):
         ('preservation', 'Wealth Preservation'),
     ]
 
+    RISK_TOLERANCE = [
+        ('conservative','Conservative'),
+        ('aggressive','Aggressive'), 
+        ('moderate','Moderate'),
+    ]
+
     name = models.CharField(max_length=100)
     email = models.EmailField()
     client_goals = models.CharField(max_length=20, choices=INVESTMENT_GOALS)
     age = models.PositiveIntegerField(max_length=3)
-    risk_tolerance = models.CharField(max_length=50)
+    risk_tolerance = models.CharField(max_length=20, choices= RISK_TOLERANCE)
     investment_goal = models.CharField(max_length=100)
-    time_horizon = models.IntegerField()
+    time_horizon = models.PositiveBigIntegerField()
     identity_number = models.PositiveBigIntegerField(max_length=13)
 
     def __str__(self):
@@ -21,6 +27,7 @@ class RetailClient(models.Model):
 
 
 class InstitutionalClient(models.Model):
+
     ORGANIZATION_TYPE = [
         ('mutual funds', 'Mutual Funds'),
         ('closed-end funds', 'Closed-end Funds'),
@@ -62,6 +69,7 @@ class InstitutionalClient(models.Model):
         ('partial','No'), 
         ('no','Partial'),
     ]
+
     # About company
     organization_type = models.CharField(max_length=20, choices=ORGANIZATION_TYPE)
     assets_held = models.PositiveBigIntegerField()
@@ -79,13 +87,25 @@ class InstitutionalClient(models.Model):
         return self.name
 
 class Portfolio(models.Model):
-    retail_client = models.OneToOneField(RetailClient,on_delete=models.CASCADE)
-
-    institutional_client = models.OneToOneField(InstitutionalClient,on_delete=models.CASCADE)
-    total_value = models.FloatField()
+    
+    retail_client = models.OneToOneField(RetailClient,null=True,blank=True,on_delete=models.CASCADE)
+    institutional_client = models.OneToOneField(InstitutionalClient,null=True,blank=True,on_delete=models.CASCADE)
+    total_value = models.FloatField(null=True,blank=True,default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
-class Asset(models.Model):
+    @staticmethod
+    def create_portfolio(client):
+        portfolio = Portfolio.objects.create(
+            retail_client=client if hasattr(client, 'retailclient') else None,
+            institutional_client=client if hasattr(client, 'institutionalclient') else None,
+            total_value=0
+        )
+        return portfolio
+
+class AssetManaged(models.Model):
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
-    asset_type = models.CharField(max_length=50)  # stocks, bonds
-    percentage = models.FloatField()
+    asset_type = models.CharField(max_length=50)  
+    name = models.CharField(max_length=100)  
+    value = models.FloatField()
+    allocation_percentage = models.FloatField()
+
