@@ -107,7 +107,7 @@ def retail_benchmark_selector(client):
 
     elif risk == "Balanced":
         
-        # Want global diversification
+        # For global diversification
         if goal == "independence":
             return "MSCI World Index"
         
@@ -174,3 +174,87 @@ def select_institutional_benchmark(client):
 
     # fallback
     return "Custom Benchmark"
+
+def retail_asset_allocation(client):
+
+    risk = client.risk_profile
+    horizon = client.time_horizon
+
+    if risk == "Aggressive":
+        if horizon >= 10:
+            return {
+                "Equities": 80,
+                "Bonds": 10,
+                "Cash": 5,
+                "Alternatives": 5
+            }
+        else:
+            return {
+                "Equities": 70,
+                "Bonds": 15,
+                "Cash": 10,
+                "Alternatives": 5
+            }
+
+    elif risk == "Balanced":
+        return {
+            "Equities": 60,
+            "Bonds": 25,
+            "Cash": 10,
+            "Alternatives": 5
+        }
+
+    else:
+        return {
+            "Equities": 40,
+            "Bonds": 40,
+            "Cash": 15,
+            "Alternatives": 5
+        }
+    
+def institutional_asset_allocation(client):
+
+    tier = client.tier
+    objective = client.return_objective
+    liquidity = client.liquidity
+    risk = client.risk_tolerance
+
+    if "Tier 3" in tier:
+        if objective == "income":
+            return {
+                "Equities": 30,
+                "Bonds": 50,
+                "Cash": 10,
+                "Alternatives": 10
+            }
+
+        return {
+            "Equities": 50,
+            "Bonds": 30,
+            "Cash": 10,
+            "Alternatives": 10
+        }
+
+    elif "Tier 2" in tier:
+        if risk == "aggressive":
+            return {
+                "Equities": 65,
+                "Bonds": 20,
+                "Cash": 10,
+                "Alternatives": 5
+            }
+
+        return {
+            "Equities": 50,
+            "Bonds": 30,
+            "Cash": 15,
+            "Alternatives": 5
+        }
+
+    else:
+        return {
+            "Equities": 70,
+            "Bonds": 20,
+            "Cash": 5,
+            "Alternatives": 5
+        }

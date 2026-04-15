@@ -8,18 +8,16 @@
 <p>Amount invested: R {{ portfolio.total_value }}</p>
 <h3>Risk Profile: {{ client.risk_profile }}</h3>
 <h3>Suggested benchmark: {{ client.benchmark }}</h3>
-<h2>Assets</h2>
 
-{% for asset in assets %}
-<div class="card">
-    <h3>{{ asset.name }}</h3>
-    <p>Type: {{ asset.asset_type }}</p>
-    <p>Value: R {{ asset.value }}</p>
-    <p>Allocation: {{ asset.allocation_percentage }}%</p>
-</div>
-{% empty %}
-<p>No assets yet</p>
-{% endfor %}
+<h3>Asset Allocation Suggestion</h3>
+
+<ul>
+    <li>Equities: {{ client.asset_allocation.Equities }}%</li>
+    <li>Bonds: {{ client.asset_allocation.Bonds }}%</li>
+    <li>Cash: {{ client.asset_allocation.Cash }}%</li>
+    <li>Alternatives: {{ client.asset_allocation.Alternatives }}%</li>
+</ul>
+
 <p>Image on top</p>
 <p>navigation bar in the midddle with a simple summary view</p>
 <p>a few action buttons</p>

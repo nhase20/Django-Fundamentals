@@ -5,4 +5,14 @@
 
 <h3>Client Tier: {{ client.tier }}</h3>
 <h3>Suggested Benchmark: {{ client.benchmark }}</h3>
+
+<h3>Asset Allocation Suggestion</h3>
+
+<ul>
+    <li>Equities: {{ client.asset_allocation.Equities }}%</li>
+    <li>Bonds: {{ client.asset_allocation.Bonds }}%</li>
+    <li>Cash: {{ client.asset_allocation.Cash }}%</li>
+    <li>Alternatives: {{ client.asset_allocation.Alternatives }}%</li>
+</ul>
+
 {% endblock %}

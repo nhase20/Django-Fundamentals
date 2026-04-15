@@ -1,5 +1,5 @@
 from django.db import models
-from .automations import classify_retailer, classify_institution, retail_benchmark_selector, select_institutional_benchmark
+from .automations import classify_retailer, classify_institution, retail_benchmark_selector, select_institutional_benchmark,institutional_asset_allocation,retail_asset_allocation
 
 class RetailClient(models.Model):
     INVESTMENT_GOALS = [
@@ -30,9 +30,12 @@ class RetailClient(models.Model):
         return classify_retailer(self)
     
     @property
-    def benchmark (self):
+    def benchmark(self):
         return retail_benchmark_selector(self)
-    
+    @property
+    def asset_allocation(self):
+        return retail_asset_allocation(self)
+
     def __str__(self):
         return self.name
 
@@ -102,6 +105,10 @@ class InstitutionalClient(models.Model):
     @property
     def benchmark(self):
         return select_institutional_benchmark(self)
+    
+    @property
+    def asset_allocation(self):
+        return institutional_asset_allocation(self)
     
     def __str__(self):
         return self.organization_name
