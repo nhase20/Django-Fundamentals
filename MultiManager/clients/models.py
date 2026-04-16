@@ -89,13 +89,13 @@ class InstitutionalClient(models.Model):
     organization_type = models.CharField(max_length=20, choices=ORGANIZATION_TYPE)
     assets_held = models.PositiveBigIntegerField()
     # Aims and objectives
-    target_return = models.PositiveSmallIntegerField(max_length=3,default=0)
+    target_return = models.PositiveSmallIntegerField()
     return_objective = models.CharField(max_length=20, choices=RETURN_OBJECTIVE)
     #benchmark =  models.CharField(max_length=20, choices= BENCHMARK)
     performance = models.CharField(max_length=20, choices= PERFORMANCE_REL_BENCHMARK)
     risk_tolerance = models.CharField(max_length=20, choices= RISK_TOLERANCE)
     liquidity = models.CharField(max_length=20, choices= LIQUIDITY_REQUIREMENTS)
-    manager_numbers = models.PositiveIntegerField(max_length=3)
+    manager_numbers = models.PositiveIntegerField()
     time_horizon = models.IntegerField()
 
     @property

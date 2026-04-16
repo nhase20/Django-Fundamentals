@@ -5,7 +5,31 @@
 
 <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
+    
+    <h3>Personal Information</h3>
+
+    <label>Your Name</label>
+    {{ form.name }}
+    <label>Email Address</label>
+    {{ form.email }}
+    <label>Your Age</label>
+    {{ form.age }}
+    <label>ID number</label>
+    {{ form.identity_number }}
+    
+    <h3>Investment Profile</h3>
+
+    <label>What are your goals in creating this account?</label>
+    {{ form.client_goals }}
+    <label>How good are you at tolerating risk (1-5)?</label>
+    {{ form.risk_tolerance }}
+    <label>How many years do you wish to invest for?</label>
+    {{ form.time_horizon }}
+    <label>Please explain briefly wht you hope to get out of this experience</label>
+    {{ form.investment_goal }}
+    
+
+
     <button type="submit">Submit</button>
 </form>
 

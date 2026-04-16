@@ -1,28 +1,23 @@
 {% extends 'home.html' %}
 
 {% block content %}
-<h1>Investment Manager</h1>
+<h1>Welcome to Investment Manager</h1>
+<p>Select how you want to get started</p>
 
-<!-- <form method="POST">
-    {% csrf_token %}
+<div class="card-row">
 
-    <input type="text" name="username" placeholder="Username">
-    <input type="password" name="password" placeholder="Password">
+    <div class="card">
+        <h3>Retail Client</h3>
+        <p>Simple guided investment plans tailored to your goals.</p>
+        <a href="/onboarding/retail/" class="btn">Get Started</a>
+    </div>
 
-    <button type="submit">Login</button>
-</form>
+    <div class="card">
+        <h3>Institutional Client</h3>
+        <p>Advanced portfolio control with benchmarks and allocation.</p>
+        <a href="/onboarding/institutional/" class="btn btn-outline">Get Started</a>
+    </div>
 
-{% if error %}
-<p style="color:red;">{{ error }}</p>
-{% endif %} -->
+</div>
 
-<h3>For new Users</h3>
-<a href="/onboarding/retail/">Retail Client</a>
-<p>Receive simple, guided investment plans tailored to your goals and risk level with minimal
-control over detailed decisions.</p>
-<a href="/onboarding/institutional/">Institutional Client</a>
-<p>Our trust that you will receive fully customised investment strategies with detailed control over risk, benchmarks,
-asset allocation, and manager selection.</p>
-
-<h4>About us</h4>
 {% endblock %}

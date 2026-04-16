@@ -29,6 +29,9 @@ def onboarding(request, client_type):
                 return redirect('retail-dashboard', client_id=client.id)
             else:
                 return redirect('institutional-dashboard', client_id=client.id)
+        else:
+            print("FORM ERRORS:", form.errors)
+            print("NON FIELD ERRORS:", form.non_field_errors())
     else:
         form = FormClass(initial={'client_type': client_type})
 
