@@ -1,8 +1,11 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import RetailClient, Portfolio
+from django.contrib.auth.models import User
+from .models import  Portfolio, Profile
 
-@receiver(post_save, sender=RetailClient)
+@receiver(post_save, sender=User)
 def create_portfolio(sender, instance, created, **kwargs):
     if created:
-        Portfolio.create_portfolio(instance)
+
+        # Portfolio.create_portfolio(instance)
+        Profile.objects.get_or_create(user=instance)

@@ -6,10 +6,6 @@
 
 <!-- TOP CARDS -->
 <div class="card-row">
-    <div class="card">
-        <h4>Portfolio Value</h4>
-        <h2>R {{ total_value }}</h2>
-    </div>
 
     <div class="card">
         <h4>Risk Profile</h4>
@@ -17,7 +13,7 @@
     </div>
 
     <div class="card">
-        <h4>Benchmark</h4>
+        <h4>Benchmark Suggestion</h4>
         <p>{{ client.benchmark }}</p>
     </div>
 </div>
@@ -26,7 +22,7 @@
 
 <!-- ALLOCATION -->
 <div class="card">
-    <h3>Asset Allocation</h3>
+    <h3>Asset Allocation Suggestion</h3>
     <ul>
         <li>Equities: {{ client.asset_allocation.Equities }}%</li>
         <li>Bonds: {{ client.asset_allocation.Bonds }}%</li>

@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.db import models
 from .automations import classify_retailer, classify_institution, retail_benchmark_selector, select_institutional_benchmark,institutional_asset_allocation,retail_asset_allocation
 
 class RetailClient(models.Model):
@@ -16,15 +18,16 @@ class RetailClient(models.Model):
         (5, 'Excellent'),
     ]
 
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    
     name = models.CharField(max_length=100,default="user")
-    email = models.EmailField()
     client_goals = models.CharField(max_length=20, choices=INVESTMENT_GOALS)
     age = models.PositiveIntegerField()
     risk_tolerance = models.IntegerField( choices= RISK_TOLERANCE)
     investment_goal = models.CharField(max_length=100)
     time_horizon = models.PositiveBigIntegerField()
     identity_number = models.PositiveBigIntegerField()
-    
+
     @property
     def risk_profile(self):
         return classify_retailer(self)
@@ -41,7 +44,7 @@ class RetailClient(models.Model):
 
 
 class InstitutionalClient(models.Model):
-
+    # Just for details
     ORGANIZATION_TYPE = [
         ('mutual funds', 'Mutual Funds'),
         ('closed-end funds', 'Closed-end Funds'),
@@ -53,13 +56,6 @@ class InstitutionalClient(models.Model):
         ('income ','Income Generation'),
         ('total ','Total Return'),
     ]
-
-    # BENCHMARK = [
-    #     ('s&p 500','S&P 500'),
-    #     ('bond index','Bond index'),
-    #     ('multi-asset','Multi-asset benchmark'),
-    #     ('custom','Custom'),
-    # ]
 
     # The portfolio's performance relative to the benchmark
     PERFORMANCE_REL_BENCHMARK = [
@@ -83,6 +79,8 @@ class InstitutionalClient(models.Model):
         ('partial','No'), 
         ('no','Partial'),
     ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
 
     # About company
     organization_name = models.CharField(max_length=100, default="org")
@@ -112,6 +110,13 @@ class InstitutionalClient(models.Model):
     
     def __str__(self):
         return self.organization_name
+    
+class Profile(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # link to your existing models
+    retail_client = models.OneToOneField(RetailClient,null=True,blank=True,on_delete=models.CASCADE)
+    institutional_client = models.OneToOneField(InstitutionalClient,null=True,blank=True,on_delete=models.CASCADE)
 
 class Portfolio(models.Model):
     
