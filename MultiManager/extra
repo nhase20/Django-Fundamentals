@@ -26,3 +26,28 @@
         }
     });
 </script>
+--------------------------------------------------------------------------------------------------------
+
+{% block content %}
+<h1>Welcome back, {{ client.name }}</h1>
+<p style="color:#555; margin-top:-8px;">{{ client.client_goals|capfirst }} · Time Horizon: {{ client.time_horizon }} years</p>
+
+<!-- STATS ROW -->
+<div class="card-row" style="margin-bottom:20px;">
+    <div class="card" style="text-align:center;">
+        <h4 style="margin:0; color:#555;">Risk Profile</h4>
+        <h2 style="margin:5px 0;">{{ client.risk_profile }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4 style="margin:0; color:#555;">Benchmark</h4>
+        <h2 style="margin:5px 0; font-size:1rem;">{{ client.benchmark }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4 style="margin:0; color:#555;">Portfolio Value</h4>
+        <h2 style="margin:5px 0;">R {{ portfolio.total_value|floatformat:2 }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4 style="margin:0; color:#555;">Assets Managed</h4>
+        <h2 style="margin:5px 0;">{{ assets.count }}</h2>
+    </div>
+</div>
