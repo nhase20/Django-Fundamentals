@@ -1,0 +1,28 @@
+<div class="card">
+    <h3>Asset Allocation</h3>
+    <canvas id="allocationChart" width="300" height="300" style="max-width:300px; margin:auto; display:block;"></canvas>
+</div>
+
+<script>
+    const ctx = document.getElementById('allocationChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Equities', 'Bonds', 'Cash', 'Alternatives'],
+            datasets: [{
+                data: [
+                    {{ client.asset_allocation.Equities }},
+                    {{ client.asset_allocation.Bonds }},
+                    {{ client.asset_allocation.Cash }},
+                    {{ client.asset_allocation.Alternatives }}
+                ],
+                backgroundColor: ['#4f46e5', '#2ec4b6', '#f59e0b', '#10b981'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: { legend: { position: 'bottom' } },
+            cutout: '65%'
+        }
+    });
+</script>
