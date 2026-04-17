@@ -51,3 +51,56 @@
         <h2 style="margin:5px 0;">{{ assets.count }}</h2>
     </div>
 </div>
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+<!-- Replace your nav-links div -->
+<div class="nav-links">
+    <a href="/">Home</a>
+    {% if user.is_authenticated %}
+        <a href="{% url 'retail-dashboard' %}" style="margin-left:20px;">Dashboard</a>
+        <form method="POST" action="{% url 'logout' %}" style="display:inline; margin-left:20px;">
+            {% csrf_token %}
+            <button type="submit" style="background:transparent; color:#333; border:none; font-weight:500; cursor:pointer; padding:0; font-size:1rem;">Logout</button>
+        </form>
+    {% endif %}
+</div>
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+    path('', include('clients.urls')),
+]-----------------------------------------------------------------------------------------------------------------------------------
+
+<!-- PORTFOLIO HOLDINGS TABLE -->
+<div class="card" style="margin-top:20px;">
+    <h3>Portfolio Holdings</h3>
+    {% if assets %}
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid #ddd; text-align:left;">
+                <th style="padding:10px;">Asset</th>
+                <th>Type</th>
+                <th>Value (R)</th>
+                <th>Allocation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:10px;">{{ asset.name }}</td>
+                <td>{{ asset.asset_type }}</td>
+                <td>R {{ asset.value|floatformat:2 }}</td>
+                <td>{{ asset.allocation_percentage }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#888;">No assets have been added yet. Contact your manager to populate your portfolio.</p>
+    {% endif %}
+</div>
