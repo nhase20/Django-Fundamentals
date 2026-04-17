@@ -1,0 +1,177 @@
+<div class="card">
+    <h3>Asset Allocation</h3>
+    <canvas id="allocationChart" width="300" height="300" style="max-width:300px; margin:auto; display:block;"></canvas>
+</div>
+
+<script>
+    const ctx = document.getElementById('allocationChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Equities', 'Bonds', 'Cash', 'Alternatives'],
+            datasets: [{
+                data: [
+                    {{ client.asset_allocation.Equities }},
+                    {{ client.asset_allocation.Bonds }},
+                    {{ client.asset_allocation.Cash }},
+                    {{ client.asset_allocation.Alternatives }}
+                ],
+                backgroundColor: ['#4f46e5', '#2ec4b6', '#f59e0b', '#10b981'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: { legend: { position: 'bottom' } },
+            cutout: '65%'
+        }
+    });
+</script>
+--------------------------------------------------------------------------------------------------------
+
+{% block content %}
+<h1>Welcome back, {{ client.name }}</h1>
+<p style="color:#555; margin-top:-8px;">{{ client.client_goals|capfirst }} · Time Horizon: {{ client.time_horizon }} years</p>
+
+<!-- STATS ROW -->
+<div class="card-row" style="margin-bottom:20px;">
+    <div class="card" style="text-align:center;">
+        <h4 style="margin:0; color:#555;">Risk Profile</h4>
+        <h2 style="margin:5px 0;">{{ client.risk_profile }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4 style="margin:0; color:#555;">Benchmark</h4>
+        <h2 style="margin:5px 0; font-size:1rem;">{{ client.benchmark }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4 style="margin:0; color:#555;">Portfolio Value</h4>
+        <h2 style="margin:5px 0;">R {{ portfolio.total_value|floatformat:2 }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4 style="margin:0; color:#555;">Assets Managed</h4>
+        <h2 style="margin:5px 0;">{{ assets.count }}</h2>
+    </div>
+</div>
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+<!-- Replace your nav-links div -->
+<div class="nav-links">
+    <a href="/">Home</a>
+    {% if user.is_authenticated %}
+        <a href="{% url 'retail-dashboard' %}" style="margin-left:20px;">Dashboard</a>
+        <form method="POST" action="{% url 'logout' %}" style="display:inline; margin-left:20px;">
+            {% csrf_token %}
+            <button type="submit" style="background:transparent; color:#333; border:none; font-weight:500; cursor:pointer; padding:0; font-size:1rem;">Logout</button>
+        </form>
+    {% endif %}
+</div>
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+    path('', include('clients.urls')),
+]-----------------------------------------------------------------------------------------------------------------------------------
+
+<!-- PORTFOLIO HOLDINGS TABLE -->
+<div class="card" style="margin-top:20px;">
+    <h3>Portfolio Holdings</h3>
+    {% if assets %}
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid #ddd; text-align:left;">
+                <th style="padding:10px;">Asset</th>
+                <th>Type</th>
+                <th>Value (R)</th>
+                <th>Allocation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:10px;">{{ asset.name }}</td>
+                <td>{{ asset.asset_type }}</td>
+                <td>R {{ asset.value|floatformat:2 }}</td>
+                <td>{{ asset.allocation_percentage }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#888;">No assets have been added yet. Contact your manager to populate your portfolio.</p>
+    {% endif %}
+</div>
+-------------------------------------------------------------------------------------------------------------------------
+Watching for file changes with StatReloader
+Performing system checks...
+
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\utils\autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+    ~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\management\commands\runserver.py", line 134, in inner_run
+    self.check(**check_kwargs)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\management\base.py", line 496, in check
+    all_issues = checks.run_checks(
+        app_configs=app_configs,
+    ...<2 lines>...
+        databases=databases,
+    )
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\checks\registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\checks\urls.py", line 16, in check_url_config
+    return check_resolver(resolver)
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\checks\urls.py", line 26, in check_resolver
+    return check_method()
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\urls\resolvers.py", line 541, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\urls\resolvers.py", line 729, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\urls\resolvers.py", line 722, in urlconf_module
+    return import_module(self.urlconf_name)
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1406, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "C:\Users\E1020225\OneDrive - Sanlam Life Insurance Limited\Desktop\Django-Fundamentals\MultiManager\multimanager\urls.py", line 22, in <module>
+    path('', include('clients.urls')),
+             ~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\urls\conf.py", line 39, in include
+    urlconf_module = import_module(urlconf_module)
+  File "C:\Users\E1020225\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1406, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "C:\Users\E1020225\OneDrive - Sanlam Life Insurance Limited\Desktop\Django-Fundamentals\MultiManager\clients\urls.py", line 8, in <module>
+    path('accounts/logout/', views.LogoutView.as_view(next_page='/'), name='logout'),
+                             ^^^^^^^^^^^^^^^^
+AttributeError: module 'clients.views' has no attribute 'LogoutView'
