@@ -41,6 +41,7 @@ def classify_retailer(client):
 def classify_institution(client):
     score = 0
 
+    # The larger the corporation the less risk they will take and aim for being more conservative
     if client.assets_held:
         if client.assets_held >= 1_000_000_000:  # 1B+
             score += 7

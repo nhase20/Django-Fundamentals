@@ -19,7 +19,7 @@ class RetailClient(models.Model):
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    
+
     name = models.CharField(max_length=100,default="user")
     client_goals = models.CharField(max_length=20, choices=INVESTMENT_GOALS)
     age = models.PositiveIntegerField()
@@ -60,7 +60,7 @@ class InstitutionalClient(models.Model):
     # The portfolio's performance relative to the benchmark
     PERFORMANCE_REL_BENCHMARK = [
         ('match','Match benchmark'),
-        ('outperforn','Outperform'), 
+        ('outperform','Outperform'), 
         ('minimize','Minimize downside vs benchmark'),
     ]
 
@@ -76,8 +76,8 @@ class InstitutionalClient(models.Model):
     ]
     ESG_POLICY = [
         ('yes','Yes'),
-        ('partial','No'), 
-        ('no','Partial'),
+        ('partial','Partial'), 
+        ('no','No'),
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)

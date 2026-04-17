@@ -1,36 +1,999 @@
 {% extends 'home.html' %}
 
 {% block content %}
+<!-- most of this is claude to help with user friendl vibe so this will not be published-->
+<link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap"
+    rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<h1>{{ client.organization_name }}</h1>
+<style>
+    :root {
+        --navy: #2ec4b6;
+        --navy-mid: #cbf3f0;
+        --gold: #C8972A;
+        --gold-light: #F0C96B;
+        --slate: #4A5568;
+        --slate-light: #EDF2F7;
+        --border: #D1D9E6;
+        --text-primary: #0B1F3A;
+        --text-secondary: #4A5568;
+        --text-muted: #8A95A3;
+        --white: #FFFFFF;
+        --bg: #F4F6FA;
+        --success: #1A6B4A;
+        --success-bg: #E8F5EE;
+        --danger: #8B2020;
+        --danger-bg: #FAEAEA;
+        --warning: #7A4F10;
+        --warning-bg: #FDF3E0;
+    }
 
-<div class="card-row">
-    <div class="card">
-        <h4>Portfolio Value</h4>
-        <h2>R {{ client.total_value }}</h2>
+    body {
+        background: var(--bg) !important;
+    }
+
+    /* Override base navbar */
+    .navbar {
+        background: var(--navy) !important;
+        padding: 0 40px !important;
+        height: 60px;
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between !important;
+        border-bottom: 2px solid var(--gold);
+        box-shadow: none !important;
+    }
+
+    .navbar h3 {
+        color: var(--white);
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
+
+    .navbar h3 span {
+        color: var(--gold);
+    }
+
+    .nav-links a {
+        color: rgba(255, 255, 255, 0.75) !important;
+        font-family: 'Lato', sans-serif;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .nav-links a:hover {
+        color: var(--gold) !important;
+    }
+
+    /* Layout */
+    .inst-wrapper {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 36px 32px;
+        font-family: 'Lato', sans-serif;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .header-left {}
+
+    .org-eyebrow {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 6px;
+    }
+
+    .org-name {
+        font-family: 'DM Serif Display', serif;
+        font-size: 2rem;
+        color: var(--navy);
+        margin: 0 0 8px 0;
+        line-height: 1.1;
+    }
+
+    .org-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .org-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+    }
+
+    .org-meta-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--gold);
+    }
+
+    .header-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .tier-badge {
+        background: var(--navy);
+        color: var(--gold-light);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border: 1px solid var(--gold);
+    }
+
+    .report-date {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-family: 'DM Mono', monospace;
+    }
+
+    /* KPI STRIP */
+    .kpi-strip {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        margin-bottom: 28px;
+    }
+
+    .kpi-card {
+        background: var(--white);
+        padding: 20px 24px;
+        position: relative;
+    }
+
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--navy);
+    }
+
+    .kpi-card.accent::before {
+        background: var(--gold);
+    }
+
+    .kpi-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+
+    .kpi-value {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.65rem;
+        color: var(--navy);
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .kpi-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-family: 'DM Mono', monospace;
+    }
+
+    /* MAIN GRID */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* PANELS */
+    .panel {
+        background: var(--white);
+        border: 1px solid var(--border);
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--navy);
+    }
+
+    .panel-tag {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+    }
+
+    .panel-body {
+        padding: 24px;
+    }
+
+    /* ALLOCATION CHART */
+    .allocation-chart-wrap {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 24px;
+    }
+
+    .chart-center-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .chart-center-label .cl-val {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.4rem;
+        color: var(--navy);
+        display: block;
+    }
+
+    .chart-center-label .cl-lbl {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .allocation-legend {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .allocation-legend li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.82rem;
+    }
+
+    .allocation-legend li:last-child {
+        border-bottom: none;
+    }
+
+    .legend-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .legend-name {
+        color: var(--text-secondary);
+    }
+
+    .legend-pct {
+        font-family: 'DM Mono', monospace;
+        font-weight: 500;
+        color: var(--navy);
+        font-size: 0.82rem;
+    }
+
+    /* MANDATE TABLE */
+    .mandate-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.83rem;
+    }
+
+    .mandate-table tr {
+        border-bottom: 1px solid var(--border);
+    }
+
+    .mandate-table tr:last-child {
+        border-bottom: none;
+    }
+
+    .mandate-table td {
+        padding: 12px 0;
+        vertical-align: top;
+    }
+
+    .mandate-table td:first-child {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        width: 45%;
+        padding-right: 12px;
+    }
+
+    .mandate-table td:last-child {
+        color: var(--navy);
+        font-weight: 400;
+    }
+
+    /* BOTTOM GRID */
+    .bottom-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* RISK METER */
+    .risk-meter-wrap {
+        margin-bottom: 20px;
+    }
+
+    .risk-track {
+        height: 8px;
+        background: linear-gradient(to right, #1A6B4A, #C8972A, #8B2020);
+        border-radius: 0;
+        position: relative;
+        margin: 16px 0 8px;
+    }
+
+    .risk-needle {
+        position: absolute;
+        top: -6px;
+        width: 20px;
+        height: 20px;
+        background: var(--white);
+        border: 2px solid var(--navy);
+        border-radius: 50%;
+        transform: translateX(-50%);
+        transition: left 0.5s ease;
+    }
+
+    .risk-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .risk-profile-label {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.3rem;
+        color: var(--navy);
+        margin-bottom: 4px;
+    }
+
+    .risk-profile-desc {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+
+    /* STATUS PILLS */
+    .status-pill {
+        display: inline-block;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 3px 8px;
+    }
+
+    .pill-success {
+        background: var(--success-bg);
+        color: var(--success);
+    }
+
+    .pill-warning {
+        background: var(--warning-bg);
+        color: var(--warning);
+    }
+
+    .pill-danger {
+        background: var(--danger-bg);
+        color: var(--danger);
+    }
+
+    .pill-neutral {
+        background: var(--slate-light);
+        color: var(--slate);
+    }
+
+    /* COMPLIANCE TABLE */
+    .compliance-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .compliance-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.82rem;
+    }
+
+    .compliance-item:last-child {
+        border-bottom: none;
+    }
+
+    .ci-label {
+        color: var(--text-secondary);
+    }
+
+    /* BENCHMARK SECTION */
+    .benchmark-comparison {
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+        margin-top: 8px;
+    }
+
+    .benchmark-bar-wrap {
+        flex: 1;
+    }
+
+    .bm-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+
+    .bm-track {
+        height: 28px;
+        background: var(--slate-light);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bm-fill {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding-left: 8px;
+    }
+
+    .bm-fill-val {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.78rem;
+        font-weight: 500;
+    }
+
+    /* ASSETS TABLE */
+    .assets-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+    }
+
+    .assets-table thead tr {
+        border-bottom: 2px solid var(--navy);
+    }
+
+    .assets-table th {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 0 0 10px 0;
+        text-align: left;
+    }
+
+    .assets-table th:not(:first-child) {
+        text-align: right;
+    }
+
+    .assets-table td {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        color: var(--navy);
+    }
+
+    .assets-table td:not(:first-child) {
+        text-align: right;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.8rem;
+    }
+
+    .asset-type-tag {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 2px 6px;
+        background: var(--slate-light);
+        color: var(--slate);
+        margin-left: 8px;
+        vertical-align: middle;
+    }
+
+    .no-assets-msg {
+        text-align: center;
+        padding: 40px 0;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .no-assets-msg p {
+        margin: 4px 0;
+    }
+
+    .no-assets-msg .na-heading {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1rem;
+        color: var(--navy);
+        margin-bottom: 6px;
+    }
+
+    /* FOOTER */
+    .dash-footer {
+        border-top: 1px solid var(--border);
+        padding-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-family: 'DM Mono', monospace;
+    }
+
+    .footer-brand {
+        font-family: 'DM Serif Display', serif;
+        font-size: 0.85rem;
+        color: var(--navy);
+    }
+
+    .footer-brand span {
+        color: var(--gold);
+    }
+
+    @media (max-width: 900px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .bottom-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .kpi-strip {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .inst-wrapper {
+            padding: 20px 16px;
+        }
+    }
+</style>
+
+<div class="inst-wrapper">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="header-left">
+            <div class="org-eyebrow">Institutional Client Portfolio</div>
+            <h1 class="org-name">{{ client.organization_name }}</h1>
+            <div class="org-meta">
+                <div class="org-meta-item">
+                    <div class="org-meta-dot"></div>
+                    {{ client.get_organization_type_display }}
+                </div>
+                <div class="org-meta-item">
+                    <div class="org-meta-dot"></div>
+                    {{ client.manager_numbers }} Manager{{ client.manager_numbers|pluralize }}
+                </div>
+                <div class="org-meta-item">
+                    <div class="org-meta-dot"></div>
+                    {{ client.time_horizon }}-Year Horizon
+                </div>
+                <div class="org-meta-item">
+                    <div class="org-meta-dot"></div>
+                    Liquidity: {{ client.get_liquidity_display }}
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="tier-badge">{{ client.tier }}</div>
+            <div class="report-date">
+                Report Date: {% now "N j, Y" %}
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-        <h4>Tier</h4>
-        <p>{{ client.tier }}</p>
+    <!-- KPI STRIP -->
+    <div class="kpi-strip">
+        <div class="kpi-card accent">
+            <div class="kpi-label">Portfolio Value</div>
+            <div class="kpi-value">R {{ portfolio.total_value|floatformat:0 }}</div>
+            <div class="kpi-sub">Total Assets Under Management</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Assets Held</div>
+            <div class="kpi-value">R {{ client.assets_held }}</div>
+            <div class="kpi-sub">Declared at Onboarding</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Target Return</div>
+            <div class="kpi-value">{{ client.target_return }}%</div>
+            <div class="kpi-sub">Annualised Objective</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Holdings</div>
+            <div class="kpi-value">{{ assets.count }}</div>
+            <div class="kpi-sub">Active Positions</div>
+        </div>
     </div>
 
-    <div class="card">
-        <h4>Benchmark</h4>
-        <p>{{ client.benchmark }}</p>
+    <!-- MAIN GRID: Allocation + Mandate -->
+    <div class="main-grid">
+
+        <!-- LEFT: Holdings Table (full width left col) -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Portfolio Holdings</div>
+                <div class="panel-tag">Live Positions</div>
+            </div>
+            <div class="panel-body" style="padding: 0 24px 24px;">
+                {% if assets %}
+                <table class="assets-table">
+                    <thead>
+                        <tr>
+                            <th>Instrument</th>
+                            <th>Type</th>
+                            <th>Allocation</th>
+                            <th>Value (R)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in assets %}
+                        <tr>
+                            <td>{{ asset.name }}</td>
+                            <td style="text-align:right;">
+                                <span class="asset-type-tag">{{ asset.asset_type }}</span>
+                            </td>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:8px; justify-content:flex-end;">
+                                    <div
+                                        style="width:60px; height:4px; background:var(--slate-light); overflow:hidden;">
+                                        <!-- <div
+                                            style="width:{{ asset.allocation_percentage }}%; height:100%; background:var(--navy);">
+                                        </div> -->
+                                    </div>
+                                    {{ asset.allocation_percentage }}%
+                                </div>
+                            </td>
+                            <td>{{ asset.value|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="no-assets-msg" style="padding-top:32px;">
+                    <div class="na-heading">No positions on record</div>
+                    <p>Holdings will appear here once your portfolio is populated by your manager.</p>
+                    <p>Contact your portfolio manager to initialise positions.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RIGHT: Allocation Donut + Mandate -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+
+            <!-- Allocation chart -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Asset Allocation</div>
+                    <div class="panel-tag">Recommended</div>
+                </div>
+                <div class="panel-body">
+                    <div class="allocation-chart-wrap">
+                        <canvas id="allocChart"></canvas>
+                        <div class="chart-center-label">
+                            <span class="cl-val">{{ client.asset_allocation.Equities }}%</span>
+                            <span class="cl-lbl">Equities</span>
+                        </div>
+                    </div>
+                    <ul class="allocation-legend">
+                        <li>
+                            <div class="legend-left">
+                                <div class="legend-dot" style="background:#0B1F3A;"></div>
+                                <span class="legend-name">Equities</span>
+                            </div>
+                            <span class="legend-pct">{{ client.asset_allocation.Equities }}%</span>
+                        </li>
+                        <li>
+                            <div class="legend-left">
+                                <div class="legend-dot" style="background:#C8972A;"></div>
+                                <span class="legend-name">Bonds</span>
+                            </div>
+                            <span class="legend-pct">{{ client.asset_allocation.Bonds }}%</span>
+                        </li>
+                        <li>
+                            <div class="legend-left">
+                                <div class="legend-dot" style="background:#4A5568;"></div>
+                                <span class="legend-name">Cash</span>
+                            </div>
+                            <span class="legend-pct">{{ client.asset_allocation.Cash }}%</span>
+                        </li>
+                        <li>
+                            <div class="legend-left">
+                                <div class="legend-dot" style="background:#D1D9E6;"></div>
+                                <span class="legend-name">Alternatives</span>
+                            </div>
+                            <span class="legend-pct">{{ client.asset_allocation.Alternatives }}%</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+    <!-- BOTTOM GRID: Risk + Mandate | Compliance + Benchmark -->
+    <div class="bottom-grid">
+
+        <!-- Risk Profile -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Risk Profile</div>
+                <div class="panel-tag">{{ client.get_risk_tolerance_display }}</div>
+            </div>
+            <div class="panel-body">
+                <div class="risk-profile-label">{{ client.get_risk_tolerance_display }}</div>
+                <div class="risk-profile-desc">
+                    {% if client.risk_tolerance == 'conservative' %}
+                    Capital preservation is the primary objective. The portfolio targets low-volatility instruments with
+                    minimal drawdown exposure.
+                    {% elif client.risk_tolerance == 'moderate' %}
+                    A balanced mandate targeting steady growth with controlled downside. Suitable for medium-term
+                    institutional mandates.
+                    {% else %}
+                    A growth-oriented mandate with higher tolerance for short-term volatility in pursuit of
+                    above-benchmark returns.
+                    {% endif %}
+                </div>
+                <div class="risk-meter-wrap">
+                    <div class="risk-track">
+                        <div class="risk-needle" id="riskNeedle"></div>
+                    </div>
+                    <div class="risk-labels">
+                        <span>Conservative</span>
+                        <span>Moderate</span>
+                        <span>Aggressive</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment Mandate -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Investment Mandate</div>
+                <div class="panel-tag">IPS Summary</div>
+            </div>
+            <div class="panel-body" style="padding-top: 8px;">
+                <table class="mandate-table">
+                    <tr>
+                        <td>Return Objective</td>
+                        <td>{{ client.get_return_objective_display }}</td>
+                    </tr>
+                    <tr>
+                        <td>Performance vs Benchmark</td>
+                        <td>{{ client.get_performance_display }}</td>
+                    </tr>
+                    <tr>
+                        <td>Benchmark</td>
+                        <td>{{ client.benchmark }}</td>
+                    </tr>
+                    <tr>
+                        <td>Target Return</td>
+                        <td>{{ client.target_return }}% p.a.</td>
+                    </tr>
+                    <tr>
+                        <td>Liquidity Requirement</td>
+                        <td>{{ client.get_liquidity_display }}</td>
+                    </tr>
+                    <tr>
+                        <td>Investment Horizon</td>
+                        <td>{{ client.time_horizon }} Year{{ client.time_horizon|pluralize }}</td>
+                    </tr>
+                    <tr>
+                        <td>No. of Managers</td>
+                        <td>{{ client.manager_numbers }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Compliance Checklist -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Mandate Compliance</div>
+                <div class="panel-tag">Status Overview</div>
+            </div>
+            <div class="panel-body">
+                <ul class="compliance-list">
+                    <li class="compliance-item">
+                        <span class="ci-label">Onboarding Complete</span>
+                        <span class="status-pill pill-success">Complete</span>
+                    </li>
+                    <li class="compliance-item">
+                        <span class="ci-label">Risk Profile Assessed</span>
+                        <span class="status-pill pill-success">Confirmed</span>
+                    </li>
+                    <li class="compliance-item">
+                        <span class="ci-label">Benchmark Assigned</span>
+                        <span class="status-pill pill-success">{{ client.benchmark }}</span>
+                    </li>
+                    <li class="compliance-item">
+                        <span class="ci-label">Portfolio Funded</span>
+                        {% if portfolio.total_value > 0 %}
+                        <span class="status-pill pill-success">Active</span>
+                        {% else %}
+                        <span class="status-pill pill-warning">Pending</span>
+                        {% endif %}
+                    </li>
+                    <li class="compliance-item">
+                        <span class="ci-label">Positions Allocated</span>
+                        {% if assets.count > 0 %}
+                        <span class="status-pill pill-success">{{ assets.count }} Active</span>
+                        {% else %}
+                        <span class="status-pill pill-warning">Pending</span>
+                        {% endif %}
+                    </li>
+                    <li class="compliance-item">
+                        <span class="ci-label">IPS Mandate Documented</span>
+                        <span class="status-pill pill-success">On Record</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Benchmark Visualisation -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Benchmark Assignment</div>
+                <div class="panel-tag">{{ client.benchmark }}</div>
+            </div>
+            <div class="panel-body">
+                <p style="font-size:0.78rem; color:var(--text-secondary); margin:0 0 20px; line-height:1.6;">
+                    Based on your mandate parameters — {{ client.get_return_objective_display|lower }},
+                    {{ client.get_risk_tolerance_display|lower }} risk — your portfolio is benchmarked against
+                    the <strong style="color:var(--navy);">{{ client.benchmark }}</strong>.
+                </p>
+
+                <div class="bm-label">Suggested Allocation Targets</div>
+
+                <div style="margin-top:12px;">
+                    <div>
+                        <div>
+                            <span>Equities</span> {{ client.asset_allocation.Equities }}%
+                        </div>
+                    
+                        <div>
+                            <span>Bonds</span> {{ client.asset_allocation.Bonds }}%
+                        </div>
+                    
+                        <div>
+                            <span>Cash</span> {{ client.asset_allocation.Cash }}%
+                        </div>
+                    
+                        <div>
+                            <span>Alternatives</span> {{ client.asset_allocation.Alternatives }}%
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+                    <div class="bm-label">Performance Objective</div>
+                    <div style="font-size:0.85rem; color:var(--navy); margin-top:6px;">
+                        {{ client.get_performance_display }} the {{ client.benchmark }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="dash-footer">
+        <div class="footer-brand">Multi<span>Manager</span> &mdash; Institutional Platform</div>
+        <div>Confidential &bull; For Authorised Persons Only &bull; {% now "Y" %}</div>
+    </div>
+
 </div>
 
-<br>
+<!-- <script>
+    // Donut chart
+    const allocCtx = document.getElementById('allocChart').getContext('2d');
+    new Chart(allocCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Equities', 'Bonds', 'Cash', 'Alternatives'],
+            datasets: [{
+                data: [
+                    {{ client.asset_allocation.Equities }},
+            {{ client.asset_allocation.Bonds }},
+                    {{ client.asset_allocation.Cash }},
+        {{ client.asset_allocation.Alternatives }}
+                ],
+        backgroundColor: ['#0B1F3A', '#C8972A', '#4A5568', '#D1D9E6'],
+        borderWidth: 0,
+        hoverOffset: 4
+            }]
+        },
+        options: {
+        cutout: '72%',
+        plugins: {
+            legend: { display: false }, tooltip: {
+                callbacks: {
+                    label: function (ctx) { return ' ' + ctx.label + ': ' + ctx.parsed + '%'; }
+                }
+            }
+        },
+        animation: { animateRotate: true, duration: 800 }
+    }
+    });
 
-<div class="card">
-    <h3>Asset Allocation</h3>
-    <ul>
-        <li>Equities: {{ client.asset_allocation.Equities }}%</li>
-        <li>Bonds: {{ client.asset_allocation.Bonds }}%</li>
-        <li>Cash: {{ client.asset_allocation.Cash }}%</li>
-        <li>Alternatives: {{ client.asset_allocation.Alternatives }}%</li>
-    </ul>
-</div>
+    // Risk needle position
+    const riskMap = { 'conservative': '10%', 'moderate': '50%', 'aggressive': '90%' };
+    const riskVal = '{{ client.risk_tolerance }}';
+    const needle = document.getElementById('riskNeedle');
+    if (needle) needle.style.left = riskMap[riskVal] || '50%';
+</script> -->
 
 {% endblock %}
