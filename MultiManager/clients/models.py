@@ -3,7 +3,10 @@ from django.contrib.auth.models import User
 from django.db import models
 from .automations import classify_retailer, classify_institution, retail_benchmark_selector, select_institutional_benchmark,institutional_asset_allocation,retail_asset_allocation
 
+# Retail Client data
 class RetailClient(models.Model):
+
+    # What the user hopes to achieve at the end of this
     INVESTMENT_GOALS = [
         ('retirement', 'Retirement Planning'),
         ('independence', 'Financial Independence'),
@@ -18,8 +21,10 @@ class RetailClient(models.Model):
         (5, 'Excellent'),
     ]
 
+    # user instance which has a one-to-one reltionship with profile 
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
 
+    # A few details that can be used to create a suggestion to the user and create a custom dashboard
     name = models.CharField(max_length=100,default="user")
     client_goals = models.CharField(max_length=20, choices=INVESTMENT_GOALS)
     age = models.PositiveIntegerField()
@@ -42,7 +47,7 @@ class RetailClient(models.Model):
     def __str__(self):
         return self.name
 
-
+# Institution Client data
 class InstitutionalClient(models.Model):
     # Just for details
     ORGANIZATION_TYPE = [
@@ -63,17 +68,19 @@ class InstitutionalClient(models.Model):
         ('outperform','Outperform'), 
         ('minimize','Minimize downside vs benchmark'),
     ]
-
+    # How much risk the business is willing to take
     RISK_TOLERANCE = [
         ('conservative','Conservative'),
         ('aggressive','Aggressive'), 
         ('moderate','Moderate'),
     ]
+    # How fast they want their funds
     LIQUIDITY_REQUIREMENTS = [
         ('high','Daily'),
         ('medium','Monthly'), 
         ('low','long-term'),
     ]
+    
     ESG_POLICY = [
         ('yes','Yes'),
         ('partial','Partial'), 
@@ -110,7 +117,8 @@ class InstitutionalClient(models.Model):
     
     def __str__(self):
         return self.organization_name
-    
+
+# Client Profile information
 class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -118,13 +126,16 @@ class Profile(models.Model):
     retail_client = models.OneToOneField(RetailClient,null=True,blank=True,on_delete=models.CASCADE)
     institutional_client = models.OneToOneField(InstitutionalClient,null=True,blank=True,on_delete=models.CASCADE)
 
+# Client portfolio
 class Portfolio(models.Model):
     
+
     retail_client = models.OneToOneField(RetailClient,null=True,blank=True,on_delete=models.CASCADE)
     institutional_client = models.OneToOneField(InstitutionalClient,null=True,blank=True,on_delete=models.CASCADE)
     total_value = models.FloatField(null=True,blank=True,default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # custom method to create one portfolio for each client
     @staticmethod
     def create_portfolio(client):
         portfolio = Portfolio.objects.create(
@@ -134,6 +145,7 @@ class Portfolio(models.Model):
         )
         return portfolio
 
+# Asset data, different types of assets
 class AssetManaged(models.Model):
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
     asset_type = models.CharField(max_length=50)  

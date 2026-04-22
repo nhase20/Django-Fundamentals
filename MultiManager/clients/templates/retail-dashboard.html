@@ -72,33 +72,6 @@
     <a class="btn btn-outline">Switch Benchmark</a>
 </div>
 
-<!-- PORTFOLIO HOLDINGS TABLE -->
-<div class="card" style="margin-top:20px;">
-    <h3>Portfolio Holdings</h3>
-    {% if assets %}
-    <table style="width:100%; border-collapse:collapse;">
-        <thead>
-            <tr style="border-bottom: 2px solid #ddd; text-align:left;">
-                <th style="padding:10px;">Asset</th>
-                <th>Type</th>
-                <th>Value (R)</th>
-                <th>Allocation</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for asset in assets %}
-            <tr style="border-bottom:1px solid #eee;">
-                <td style="padding:10px;">{{ asset.name }}</td>
-                <td>{{ asset.asset_type }}</td>
-                <td>R {{ asset.value|floatformat:2 }}</td>
-                <td>{{ asset.allocation_percentage }}%</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p style="color:#888;">No assets have been added yet. Contact your manager to populate your portfolio.</p>
-    {% endif %}
-</div>
+
 
 {% endblock %}

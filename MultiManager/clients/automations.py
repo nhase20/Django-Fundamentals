@@ -1,3 +1,4 @@
+# Classification of Risk level for retail Clients
 def classify_retailer(client):
     score = 0
 
@@ -37,7 +38,8 @@ def classify_retailer(client):
         return "Balanced"
     else:
         return "Aggressive"
-    
+
+# Classification of Institutional Clients in Tiers ( will add more on it later)
 def classify_institution(client):
     score = 0
 
@@ -81,12 +83,16 @@ def classify_institution(client):
         score += 2
 
     if score <= 15:
+        # Tier 1: smaller funds, flexible, growth-focused
         return "Tier 1  (Growth Focused)"
     elif score <= 25:
+        # Tier 2: balanced mandates, moderate risk
         return "Tier 2  (Balanced Institution)"
     else:
+        # Tier 3: Strict mandates, long-term preservation
         return "Tier 3 (Large/Complex Institution)"
-    
+
+#
 def retail_benchmark_selector(client):
     
     risk = client.risk_profile
@@ -133,6 +139,7 @@ def retail_benchmark_selector(client):
     # fallback
     return "S&P 500"
 
+# Selection of Benchmark for institutional clients (More like a suggestion)
 def select_institutional_benchmark(client):
 
     objective = client.return_objective.strip()
@@ -176,6 +183,7 @@ def select_institutional_benchmark(client):
     # fallback
     return "Custom Benchmark"
 
+# Static custom asset location for retail clients based on profile and horizon
 def retail_asset_allocation(client):
 
     risk = client.risk_profile
@@ -213,6 +221,7 @@ def retail_asset_allocation(client):
             "Alternatives": 5
         }
     
+# Asset allocation for institutional clients
 def institutional_asset_allocation(client):
 
     tier = client.tier
