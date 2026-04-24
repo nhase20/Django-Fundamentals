@@ -12,12 +12,12 @@
         <h2 style="margin:5px 0;">{{ client.risk_profile }}</h2>
     </div>
     <div class="card" style="text-align:center;">
-        <h4 style="margin:0; color:#555;">Benchmark</h4>
-        <h2 style="margin:5px 0; font-size:1rem;">{{ client.benchmark }}</h2>
+        <h4 style="margin:0; color:#555;">Risk Tolerance</h4>
+        <h2 style="margin:5px 0; font-size:1rem;">{{ client.risk_tolerance }}</h2>
     </div>
     <div class="card" style="text-align:center;">
-        <h4 style="margin:0; color:#555;">Portfolio Value</h4>
-        <h2 style="margin:5px 0;">R {{ portfolio.total_value|floatformat:2 }}</h2>
+        <h4 style="margin:0; color:#555;">Risk Category</h4>
+        <h2 style="margin:5px 0;">R {{ portfolio.risk_rating}}</h2>
     </div>
     <div class="card" style="text-align:center;">
         <h4 style="margin:0; color:#555;">Assets Managed</h4>
@@ -68,7 +68,7 @@
 
 <!-- ACTIONS -->
 <div class="card-row">
-    <a class="btn">Apply for DFM</a>
+    <a class="btn">Apply for Portfolio Execution</a>
     <a class="btn btn-outline">Switch Benchmark</a>
 </div>
 

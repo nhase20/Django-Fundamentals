@@ -1,41 +1,54 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import models
-from .automations import classify_retailer, classify_institution, retail_benchmark_selector, select_institutional_benchmark,institutional_asset_allocation,retail_asset_allocation
+from .automations import retail_benchmark_selector,retail_asset_allocation
 
 # Retail Client data
-class RetailClient(models.Model):
+class Client(models.Model):
 
-    # What the user hopes to achieve at the end of this
-    INVESTMENT_GOALS = [
-        ('retirement', 'Retirement Planning'),
-        ('independence', 'Financial Independence'),
-        ('preservation', 'Wealth Preservation'),
+        # How much risk the business is willing to take
+    RISK_PROFILE = [
+        ('conservative','Conservative'),
+        ('aggressive','Aggressive'), 
+        ('moderate','Moderate'),
+        ('mod-aggressive','Moderate Aggressive')
     ]
 
+    # How fast they want their funds
     RISK_TOLERANCE = [
-        (1, 'Poor'),
-        (2, 'Fair'),
-        (3, 'Good'),
-        (4, 'Very Good'),
-        (5, 'Excellent'),
+        ('money maket','Money Market'),
+        ('sa ma income','(ASISA) South African MA Income'), 
+        ('sa ma low equity','(ASISA) South African MA Low Equity'),
+        ('sa ma medium equity','(ASISA) South African MA Medium Equity'),
+        ('sa ma high equity','(ASISA) South African MA High Equity'),
+        ('ww ma flexible','(ASISA) Worldwide MA Flexible'),
+        ('sa equity','SA Equity'),
+        ('usd cash','USD Cash'),
+        ('eaa fund usd cautious','EAA Fund USD Cautious Allocation'),
+        ('eaa fund usd moderate','EAA Fund USD Moderate Allocation'),
+        ('eaa fund usd aggressive','EAA Fund USD Aggressive Allocation'),
+        ('international equity','International Equity (ZAR)'),
+    ]
+
+    RISK_RATING = [
+        ('low', 'Low'),
+        ('pure equity', 'Pure Equity'),
+        ("low-medium", 'Low-Medium'),
+        ('medium', 'Medium'),
+        ("high", 'High'),
+        ('flexible','Flexible'),
     ]
 
     # user instance which has a one-to-one reltionship with profile 
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-
     # A few details that can be used to create a suggestion to the user and create a custom dashboard
     name = models.CharField(max_length=100,default="user")
-    client_goals = models.CharField(max_length=20, choices=INVESTMENT_GOALS)
-    age = models.PositiveIntegerField()
-    risk_tolerance = models.IntegerField( choices= RISK_TOLERANCE)
-    investment_goal = models.CharField(max_length=100)
+    risk_rating = models.CharField(choices=RISK_RATING)
+    age = models.PositiveIntegerField(default=18)
+    risk_tolerance = models.CharField(choices= RISK_TOLERANCE)
+    investment_goal = models.CharField(max_length=100,default="None")
     time_horizon = models.PositiveBigIntegerField()
-    identity_number = models.PositiveBigIntegerField()
-
-    @property
-    def risk_profile(self):
-        return classify_retailer(self)
+    risk_profile = models.CharField(choices=RISK_PROFILE)
     
     @property
     def benchmark(self):
@@ -47,91 +60,20 @@ class RetailClient(models.Model):
     def __str__(self):
         return self.name
 
-# Institution Client data
-class InstitutionalClient(models.Model):
-    # Just for details
-    ORGANIZATION_TYPE = [
-        ('mutual funds', 'Mutual Funds'),
-        ('closed-end funds', 'Closed-end Funds'),
-        ('investment trust', 'Investment Trust'),
-    ]
-    # The primary return objective
-    RETURN_OBJECTIVE = [
-        ('capital ', 'Capital Growth'),
-        ('income ','Income Generation'),
-        ('total ','Total Return'),
-    ]
 
-    # The portfolio's performance relative to the benchmark
-    PERFORMANCE_REL_BENCHMARK = [
-        ('match','Match benchmark'),
-        ('outperform','Outperform'), 
-        ('minimize','Minimize downside vs benchmark'),
-    ]
-    # How much risk the business is willing to take
-    RISK_TOLERANCE = [
-        ('conservative','Conservative'),
-        ('aggressive','Aggressive'), 
-        ('moderate','Moderate'),
-    ]
-    # How fast they want their funds
-    LIQUIDITY_REQUIREMENTS = [
-        ('high','Daily'),
-        ('medium','Monthly'), 
-        ('low','long-term'),
-    ]
-    
-    ESG_POLICY = [
-        ('yes','Yes'),
-        ('partial','Partial'), 
-        ('no','No'),
-    ]
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-
-    # About company
-    organization_name = models.CharField(max_length=100, default="org")
-    organization_type = models.CharField(max_length=20, choices=ORGANIZATION_TYPE)
-    assets_held = models.PositiveBigIntegerField()
-    # Aims and objectives
-    target_return = models.PositiveSmallIntegerField()
-    return_objective = models.CharField(max_length=20, choices=RETURN_OBJECTIVE)
-    #benchmark =  models.CharField(max_length=20, choices= BENCHMARK)
-    performance = models.CharField(max_length=20, choices= PERFORMANCE_REL_BENCHMARK)
-    risk_tolerance = models.CharField(max_length=20, choices= RISK_TOLERANCE)
-    liquidity = models.CharField(max_length=20, choices= LIQUIDITY_REQUIREMENTS)
-    manager_numbers = models.PositiveIntegerField()
-    time_horizon = models.IntegerField()
-
-    @property
-    def tier(self):
-        return classify_institution(self)
-
-    @property
-    def benchmark(self):
-        return select_institutional_benchmark(self)
-    
-    @property
-    def asset_allocation(self):
-        return institutional_asset_allocation(self)
-    
-    def __str__(self):
-        return self.organization_name
 
 # Client Profile information
 class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # link to your existing models
-    retail_client = models.OneToOneField(RetailClient,null=True,blank=True,on_delete=models.CASCADE)
-    institutional_client = models.OneToOneField(InstitutionalClient,null=True,blank=True,on_delete=models.CASCADE)
+    client = models.OneToOneField(Client,null=True,blank=True,on_delete=models.CASCADE)
 
 # Client portfolio
 class Portfolio(models.Model):
     
-
-    retail_client = models.OneToOneField(RetailClient,null=True,blank=True,on_delete=models.CASCADE)
-    institutional_client = models.OneToOneField(InstitutionalClient,null=True,blank=True,on_delete=models.CASCADE)
+    name = models.CharField(max_length=100,default="user")
+    client = models.OneToOneField(Client,null=True,blank=True,on_delete=models.CASCADE)
     total_value = models.FloatField(null=True,blank=True,default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -139,8 +81,7 @@ class Portfolio(models.Model):
     @staticmethod
     def create_portfolio(client):
         portfolio = Portfolio.objects.create(
-            retail_client=client if hasattr(client, 'retailclient') else None,
-            institutional_client=client if hasattr(client, 'institutionalclient') else None,
+            client=client if hasattr(client, 'Client') else None,
             total_value=0
         )
         return portfolio

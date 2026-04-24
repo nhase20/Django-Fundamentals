@@ -1,15 +1,9 @@
 from django import forms
-from .models import RetailClient,InstitutionalClient
+from .models import Client
 
 # Which attributes the forms of each client should show from their respecive classes
-class RetailClientForm(forms.ModelForm):
+class ClientForm(forms.ModelForm):
     class Meta:
-        model = RetailClient
-        exclude = ['user']
-        fields = '__all__'
-
-class InstitutionalClientForm(forms.ModelForm):
-    class Meta:
-        model = InstitutionalClient
+        model = Client
         exclude = ['user']
         fields = '__all__'
