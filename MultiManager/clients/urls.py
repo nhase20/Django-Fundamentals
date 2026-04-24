@@ -1,10 +1,11 @@
+# clients/urls.py
 from django.urls import path
 from . import views
 
-# Shortcut paths to different pages in the template
 urlpatterns = [
-    path('', views.home, name='home'), # Normal home page
-    path('onboarding/', views.onboarding, name='onboarding'), # Form page for each user
-    path('about/', views.about, name='about'), # About page for first time users
-    path('dashboard/', views.dashboard, name='dashboard') # Retail dashboard page
+    path('',              views.home,           name='home'),
+    path('onboarding/',   views.onboarding,     name='onboarding'),
+    path('about/',        views.about,          name='about'),
+    path('dashboard/',    views.dashboard,       name='dashboard'),
+    path('overview/',     views.admin_overview,  name='admin_overview'),  # ADD THIS
 ]

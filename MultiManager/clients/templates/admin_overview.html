@@ -1,0 +1,211 @@
+{% extends 'home.html' %}
+
+{% block content %}
+
+<div
+    style="margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div>
+        <h1 style="margin:0 0 4px;">Advisor Overview</h1>
+        <p style="color:#555; margin:0;">All clients across all groups</p>
+    </div>
+    <a href="{% url 'onboarding' %}" class="btn">+ Onboard New Client</a>
+</div>
+
+<!-- SUMMARY CARDS -->
+<div class="card-row">
+    <div class="card" style="text-align:center;">
+        <h4>Total Clients</h4>
+        <h2>{{ total|default:0 }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4>Risk Profiles</h4>
+        <h2>{{ profile_dist|length }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4>Client Groups</h4>
+        <h2>{{ group_dist|length }}</h2>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h4>Portfolio Matches</h4>
+        <h2>{{ portfolio_dist|length }}</h2>
+    </div>
+</div>
+
+<!-- CHARTS -->
+<div class="card-row" style="margin-top:24px;">
+    <div class="card" style="flex:1;">
+        <h3>Clients by Risk Profile</h3>
+        <canvas id="profileChart"></canvas>
+    </div>
+
+    <div class="card" style="flex:2;">
+        <h3>Clients by Group</h3>
+        <canvas id="groupChart"></canvas>
+    </div>
+</div>
+
+<div class="card-row" style="margin-top:20px;">
+    <div class="card">
+        <h3>Investment Horizons</h3>
+        <canvas id="horizonChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Client Age Bands</h3>
+        <canvas id="ageChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Risk Rating Breakdown</h3>
+        {% for r in rating_dist %}
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee;">
+            <span>{{ r.risk_rating|capfirst }}</span>
+            <strong>{{ r.count }}</strong>
+        </div>
+        {% empty %}
+        <p style="color:#999;">No data yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- PORTFOLIOS + TABLE -->
+<div class="card-row" style="margin-top:20px;">
+    <div class="card" style="flex:1;">
+        <h3>Most Common Portfolios</h3>
+        {% for p in portfolio_dist %}
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee;">
+            <span>{{ p.name }}</span>
+            <span class="badge">{{ p.count }}</span>
+        </div>
+        {% empty %}
+        <p style="color:#999;">No portfolio assignments yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card" style="flex:2; overflow-x:auto;">
+        <h3>All Clients</h3>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="border-bottom:2px solid #ddd;">
+                    <th>Name</th>
+                    <th>Group</th>
+                    <th>Profile</th>
+                    <th>Horizon</th>
+                    <th>Age</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in all_clients %}
+                <tr style="border-bottom:1px solid #eee;">
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.client_group }}</td>
+                    <td>{{ c.risk_profile }}</td>
+                    <td>{{ c.time_horizon }}y</td>
+                    <td>{{ c.age }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center; color:#999;">
+                        No clients onboarded yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- JSON DATA -->
+{{ profile_labels|json_script:"profile-labels" }}
+{{ profile_counts|json_script:"profile-counts" }}
+
+{{ group_labels|json_script:"group-labels" }}
+{{ group_counts|json_script:"group-counts" }}
+
+{{ horizon_labels|json_script:"horizon-labels" }}
+{{ horizon_counts|json_script:"horizon-counts" }}
+
+{{ age_labels|json_script:"age-labels" }}
+{{ age_counts|json_script:"age-counts" }}
+
+<script>
+    const COLOURS = ['#4f46e5', '#0ea5e9', '#f59e0b', '#10b981', '#dc2626', '#8b5cf6'];
+
+    function getJSON(id) {
+        const el = document.getElementById(id);
+        if (!el) return [];
+        try {
+            return JSON.parse(el.textContent);
+        } catch {
+            return [];
+        }
+    }
+
+    function makeChart(id, type, labels, data, options = {}) {
+        const canvas = document.getElementById(id);
+        if (!canvas || !labels.length || !data.length) return;
+
+        new Chart(canvas, {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: COLOURS.slice(0, data.length)
+                }]
+            },
+            options: Object.assign({
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }, options)
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        makeChart(
+            'profileChart',
+            'doughnut',
+            getJSON('profile-labels'),
+            getJSON('profile-counts'),
+            { cutout: '55%' }
+        );
+
+        makeChart(
+            'groupChart',
+            'bar',
+            getJSON('group-labels'),
+            getJSON('group-counts'),
+            {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        );
+
+        makeChart(
+            'horizonChart',
+            'bar',
+            getJSON('horizon-labels'),
+            getJSON('horizon-counts'),
+            {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        );
+
+        makeChart(
+            'ageChart',
+            'doughnut',
+            getJSON('age-labels'),
+            getJSON('age-counts'),
+            { cutout: '50%' }
+        );
+
+    });
+</script>
+
+{% endblock %}

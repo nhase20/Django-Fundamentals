@@ -3,112 +3,115 @@
 {% block content %}
 
 <!-- HEADER -->
-<div style="margin-bottom: 20px;">
-    <h1 style="margin-bottom: 5px;">Welcome {{ client.name }}</h1>
-    <p style="color:#666; margin:0;">
-        {{ client.client_goals|capfirst }} · {{ client.time_horizon }} year horizon
+<div style="margin-bottom:24px;">
+    <h1>Welcome, {{ client.name|default:"Client" }}</h1>
+    <p style="color:#555; margin:0;">
+        {{ client.risk_profile|default:"-" }} ·
+        {{ client.time_horizon|default:"-" }}-year horizon ·
+        {{ client.client_group|default:"-" }}
     </p>
 </div>
 
-<!-- METRICS GRID -->
+<!-- METRIC CARDS -->
 <div class="card-row">
-
     <div class="card">
         <h4>Risk Profile</h4>
-        <h2>{{ client.risk_profile }}</h2>
+        <h2>{{ client.risk_profile|default:"-" }}</h2>
     </div>
-
     <div class="card">
-        <h4>Risk Tolerance</h4>
-        <h2 style="font-size: 1rem;">{{ client.risk_tolerance }}</h2>
+        <h4>Fund Category</h4>
+        <h2 style="font-size:0.9rem;">{{ client.risk_tolerance|default:"-" }}</h2>
     </div>
-
     <div class="card">
-        <h4>Risk Category</h4>
-        <h2>R {{ portfolio.risk_rating }}</h2>
+        <h4>Risk Rating</h4>
+        <h2>{{ client.risk_rating|capfirst|default:"-" }}</h2>
     </div>
-
     <div class="card">
-        <h4>Assets Managed</h4>
-        <h2>4</h2>
+        <h4>Matched Portfolios</h4>
+        <h2>{{ recommended_portfolios|length }}</h2>
     </div>
-
 </div>
 
+<!-- MAIN GRID -->
+<div class="card-row" style="margin-top:24px; align-items:flex-start;">
 
-
-<!-- MAIN CONTENT GRID -->
-<div class="card-row" style="margin-top: 20px;">
-
-    <!-- LEFT: Allocation + Confidence -->
-    <div style="flex: 2; display: flex; flex-direction: column; gap: 20px;">
+    <!-- LEFT -->
+    <div style="flex:2; display:flex; flex-direction:column; gap:20px;">
 
         <!-- ALLOCATION -->
         <div class="card">
-            <h3>Asset Allocation (%)</h3>
-            {{ client.asset_allocation|json_script:"allocation-data" }}
-        
-            <canvas id="allocationChart" width="300" height="300" style="max-width:300px; margin:auto; display:block;"></canvas>
-        </div>
-        
-        <script>
-            const allocation = JSON.parse(
-                document.getElementById('allocation-data').textContent
-            );
-
-            const ctx = document.getElementById('allocationChart').getContext('2d');
-
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Equities', 'Bonds', 'Cash', 'Alternatives'],
-                    datasets: [{
-                        data: [
-                            allocation.Equities,
-                            allocation.Bonds,
-                            allocation.Cash,
-                            allocation.Alternatives
-                        ],
-                        backgroundColor: ['#4f46e5', '#ffffff', '#f59e0b', '#10b981'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    plugins: { legend: { position: 'bottom' } },
-                    cutout: '65%'
-                }
-            });
-        </script>
-
-        <br>
-
-        <!-- CONFIDENCE -->
-        <div class="card">
-            <h3>Match Confidence</h3>
-            <h2 style="color: green;">92%</h2>
-            <p style="color:#666;">
-                High confidence match based on client profile alignment.
+            <h3>Your Asset Allocation</h3>
+            <p style="color:#555; font-size:0.85rem;">
+                Based on your {{ client.risk_profile|default:"-" }} profile,
+                {{ client.time_horizon|default:"-" }}-year horizon,
+                and {{ client.risk_rating|default:"-" }} risk rating.
             </p>
+
+            <div style="display:flex; gap:24px; flex-wrap:wrap;">
+                <canvas id="allocationChart" width="220" height="220"></canvas>
+
+                <div style="flex:1;">
+                    {% if allocation %}
+                    {% for label, pct in allocation.items %}
+                    <div style="margin-bottom:10px;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>{{ label }}</span>
+                            <strong>{{ pct }}%</strong>
+                        </div>
+                        <div style="background:#eee; height:6px; border-radius:4px;">
+                            <!-- <div style="width:{{ pct|default:0|floatformat:0 }}%; height:6px; background:#4f46e5;"></div> -->
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p style="color:#999;">No allocation data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- INSIGHTS -->
+        <div class="card">
+            <h3>Portfolio Suitability</h3>
+            <p><strong>{{ insights.suitability|default:"-" }}</strong></p>
+            <p style="color:#444;">{{ insights.reasoning|default:"-" }}</p>
+            <p style="font-size:0.85rem;">
+                Suggested benchmark: <strong>{{ insights.benchmark|default:"-" }}</strong>
+            </p>
+        </div>
+
+        <!-- SCENARIOS -->
+        <div class="card">
+            <h3>Risk / Return Scenarios</h3>
+
+            {% if insights.scenarios %}
+            {% for scenario in insights.scenarios %}
+            <!-- <div style="border-left:4px solid {{ scenario.colour|default:'#4f46e5' }};
+                            padding:10px; margin-bottom:10px; background:#f5f5f5;"> -->
+                <strong>{{ scenario.label|default:"Scenario" }}</strong><br>
+                <small>{{ scenario.return_range|default:"-" }} · {{ scenario.probability|default:"-" }}</small>
+                <p style="margin:4px 0 0;">{{ scenario.description|default:"-" }}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p style="color:#999;">No scenario data available.</p>
+            {% endif %}
         </div>
 
     </div>
 
+    <!-- RIGHT -->
+    <div style="flex:1; display:flex; flex-direction:column; gap:20px;">
 
-    <!-- RIGHT: Recommendation Panel -->
-    <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
-
-        <!-- PORTFOLIO -->
+        <!-- PORTFOLIOS -->
         <div class="card">
-            <h3>Recommended Portfolio</h3>
-
+            <h3>Recommended Portfolios</h3>
             {% if recommended_portfolios %}
-            <ul style="margin-top:10px; padding-left: 18px;">
-                {% for portfolio in recommended_portfolios %}
-                <li style="margin-bottom: 10px;">
-                    <strong>{{ portfolio.name }}</strong><br>
-                    <small style="color:#666;">
-                        {{ portfolio.risk_profile }} · {{ portfolio.fund_category }}
-                    </small>
+            <ul>
+                {% for p in recommended_portfolios %}
+                <li>
+                    <strong>{{ p.name }}</strong><br>
+                    <small>{{ p.risk_profile }} · {{ p.fund_category }}</small>
                 </li>
                 {% endfor %}
             </ul>
@@ -117,44 +120,67 @@
             {% endif %}
         </div>
 
-        <!-- RISK INSIGHT -->
+        <!-- RISK INTERPRETATION -->
         <div class="card">
-            <h3 style="margin-top:0;">Risk Interpretation</h3>
-            <p style="color:#555; margin:0;">
-                A <strong>{{ client.risk_profile }}</strong> client with a
-                <strong>{{ client.time_horizon }}-year</strong> horizon
-                typically prioritises
+            <h3>Risk Interpretation</h3>
+            <p>
+                A <strong>{{ client.risk_profile|default:"-" }}</strong> client with a
+                <strong>{{ client.time_horizon|default:"-" }}-year</strong> horizon
                 {% if client.risk_profile == "Aggressive" or client.risk_profile == "Moderate Aggressive" %}
-                capital growth over capital preservation.
+                prioritises growth and accepts volatility.
                 {% elif client.risk_profile == "Conservative" or client.risk_profile == "Cautious" %}
-                capital preservation over growth.
+                prioritises stability and income.
                 {% else %}
-                a balance between growth and preservation.
+                balances growth and preservation.
                 {% endif %}
             </p>
-        </div>
-
-        <!-- ALTERNATIVES -->
-        <div class="card">
-            <h3>Alternative Options</h3>
-            <ul style="margin:0; padding-left: 18px; color:#555;">
-                <li>Moderate Growth Fund</li>
-                <li>Balanced Income Fund</li>
-            </ul>
         </div>
 
         <!-- ACTIONS -->
         <div class="card">
             <h3>Advisor Actions</h3>
-
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="btn">Approve</button>
-                <button class="btn btn-outline">Override Portfolio</button>
-                <button class="btn btn-outline">Request More Info</button>
-            </div>
+            <button class="btn">Approve Portfolio</button>
+            <button class="btn btn-outline">Override</button>
+            <button class="btn btn-outline">Add portfolio</button>
         </div>
 
     </div>
 </div>
+
+<!-- CHART -->
+<script>
+    (function () {
+        const canvas = document.getElementById('allocationChart');
+        if (!canvas) return;
+
+        let allocation = {};
+        try {
+            allocation = JSON.parse('{{ allocation_json|escapejs }}');
+        } catch {
+            allocation = {};
+        }
+
+        const labels = Object.keys(allocation);
+        const values = Object.values(allocation);
+
+        if (!labels.length || !values.length) return;
+
+        new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#4f46e5', '#0ea5e9', '#f59e0b', '#10b981']
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                cutout: '60%',
+                responsive: true
+            }
+        });
+    })();
+</script>
 
 {% endblock %}
