@@ -2,76 +2,159 @@
 
 {% block content %}
 
-<h1>Welcome {{ client.name }}</h1>
-<p style="color:#555; margin-top:-8px;">{{ client.client_goals|capfirst }} · Time Horizon: {{ client.time_horizon }} years</p>
-
-<!-- TOP CARDS -->
-<div class="card-row" style="margin-bottom:20px;">
-    <div class="card" style="text-align:center;">
-        <h4 style="margin:0; color:#555;">Risk Profile</h4>
-        <h2 style="margin:5px 0;">{{ client.risk_profile }}</h2>
-    </div>
-    <div class="card" style="text-align:center;">
-        <h4 style="margin:0; color:#555;">Risk Tolerance</h4>
-        <h2 style="margin:5px 0; font-size:1rem;">{{ client.risk_tolerance }}</h2>
-    </div>
-    <div class="card" style="text-align:center;">
-        <h4 style="margin:0; color:#555;">Risk Category</h4>
-        <h2 style="margin:5px 0;">R {{ portfolio.risk_rating}}</h2>
-    </div>
-    <div class="card" style="text-align:center;">
-        <h4 style="margin:0; color:#555;">Assets Managed</h4>
-        <h2 style="margin:5px 0;">4</h2>
-    </div>
+<!-- HEADER -->
+<div style="margin-bottom: 20px;">
+    <h1 style="margin-bottom: 5px;">Welcome {{ client.name }}</h1>
+    <p style="color:#666; margin:0;">
+        {{ client.client_goals|capfirst }} · {{ client.time_horizon }} year horizon
+    </p>
 </div>
 
-<br>
-
-<!-- ALLOCATION -->
-<div class="card">
-    <h3>Asset Allocation</h3>
-    {{ client.asset_allocation|json_script:"allocation-data" }}
-
-    <canvas id="allocationChart" width="300" height="300" style="max-width:300px; margin:auto; display:block;"></canvas>
-</div>
-
-<script>
-    const allocation = JSON.parse(
-        document.getElementById('allocation-data').textContent
-    );
-
-    const ctx = document.getElementById('allocationChart').getContext('2d');
-
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Equities', 'Bonds', 'Cash', 'Alternatives'],
-            datasets: [{
-                data: [
-                    allocation.Equities,
-                    allocation.Bonds,
-                    allocation.Cash,
-                    allocation.Alternatives
-                ],
-                backgroundColor: ['#4f46e5', '#ffffff', '#f59e0b', '#10b981'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            plugins: { legend: { position: 'bottom' } },
-            cutout: '65%'
-        }
-    });
-</script>
-
-<br>
-
-<!-- ACTIONS -->
+<!-- METRICS GRID -->
 <div class="card-row">
-    <a class="btn">Apply for Portfolio Execution</a>
-    <a class="btn btn-outline">Switch Benchmark</a>
+
+    <div class="card">
+        <h4>Risk Profile</h4>
+        <h2>{{ client.risk_profile }}</h2>
+    </div>
+
+    <div class="card">
+        <h4>Risk Tolerance</h4>
+        <h2 style="font-size: 1rem;">{{ client.risk_tolerance }}</h2>
+    </div>
+
+    <div class="card">
+        <h4>Risk Category</h4>
+        <h2>R {{ portfolio.risk_rating }}</h2>
+    </div>
+
+    <div class="card">
+        <h4>Assets Managed</h4>
+        <h2>4</h2>
+    </div>
+
 </div>
 
 
+
+<!-- MAIN CONTENT GRID -->
+<div class="card-row" style="margin-top: 20px;">
+
+    <!-- LEFT: Allocation + Confidence -->
+    <div style="flex: 2; display: flex; flex-direction: column; gap: 20px;">
+
+        <!-- ALLOCATION -->
+        <div class="card">
+            <h3>Asset Allocation (%)</h3>
+            {{ client.asset_allocation|json_script:"allocation-data" }}
+        
+            <canvas id="allocationChart" width="300" height="300" style="max-width:300px; margin:auto; display:block;"></canvas>
+        </div>
+        
+        <script>
+            const allocation = JSON.parse(
+                document.getElementById('allocation-data').textContent
+            );
+
+            const ctx = document.getElementById('allocationChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Equities', 'Bonds', 'Cash', 'Alternatives'],
+                    datasets: [{
+                        data: [
+                            allocation.Equities,
+                            allocation.Bonds,
+                            allocation.Cash,
+                            allocation.Alternatives
+                        ],
+                        backgroundColor: ['#4f46e5', '#ffffff', '#f59e0b', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom' } },
+                    cutout: '65%'
+                }
+            });
+        </script>
+
+        <br>
+
+        <!-- CONFIDENCE -->
+        <div class="card">
+            <h3>Match Confidence</h3>
+            <h2 style="color: green;">92%</h2>
+            <p style="color:#666;">
+                High confidence match based on client profile alignment.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT: Recommendation Panel -->
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+
+        <!-- PORTFOLIO -->
+        <div class="card">
+            <h3>Recommended Portfolio</h3>
+
+            {% if recommended_portfolios %}
+            <ul style="margin-top:10px; padding-left: 18px;">
+                {% for portfolio in recommended_portfolios %}
+                <li style="margin-bottom: 10px;">
+                    <strong>{{ portfolio.name }}</strong><br>
+                    <small style="color:#666;">
+                        {{ portfolio.risk_profile }} · {{ portfolio.fund_category }}
+                    </small>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p style="color:#999;">No matching portfolio found.</p>
+            {% endif %}
+        </div>
+
+        <!-- RISK INSIGHT -->
+        <div class="card">
+            <h3 style="margin-top:0;">Risk Interpretation</h3>
+            <p style="color:#555; margin:0;">
+                A <strong>{{ client.risk_profile }}</strong> client with a
+                <strong>{{ client.time_horizon }}-year</strong> horizon
+                typically prioritises
+                {% if client.risk_profile == "Aggressive" or client.risk_profile == "Moderate Aggressive" %}
+                capital growth over capital preservation.
+                {% elif client.risk_profile == "Conservative" or client.risk_profile == "Cautious" %}
+                capital preservation over growth.
+                {% else %}
+                a balance between growth and preservation.
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- ALTERNATIVES -->
+        <div class="card">
+            <h3>Alternative Options</h3>
+            <ul style="margin:0; padding-left: 18px; color:#555;">
+                <li>Moderate Growth Fund</li>
+                <li>Balanced Income Fund</li>
+            </ul>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="card">
+            <h3>Advisor Actions</h3>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn">Approve</button>
+                <button class="btn btn-outline">Override Portfolio</button>
+                <button class="btn btn-outline">Request More Info</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 {% endblock %}

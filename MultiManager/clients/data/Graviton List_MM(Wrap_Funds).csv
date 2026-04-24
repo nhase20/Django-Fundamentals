@@ -1,0 +1,204 @@
+ID,Client_Grouping,Portfolio_Name,Risk_Profile,Fund_Category
+1,ACS,ACS Aggressive Hedge,Aggressive,(ASISA) South African MA High Equity
+2,ACS,ACS Cautious,Cautious,(ASISA) South African MA Low Equity
+3,ACS,ACS Flexible,Aggressive,(ASISA) Wwide MA Flexible
+4,ACS,ACS Moderate,Moderate,(ASISA) South African MA Medium Equity
+5,ACS,ACS Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity
+6,ACS,ACS Moderate Income,Moderate Aggressive,(ASISA) South African MA High Equity
+7,ACS,ACS Tax Free Saving,Aggressive,(ASISA) Wwide MA Flexible
+8,BKA Wealth,BKA Wealth Flexible,Aggressive,(ASISA) Wwide MA Flexible
+10,BKA Wealth,BKA Wealth High Growth,Moderate Aggressive,(ASISA) South African MA High Equity
+12,BKA Wealth,BKA Wealth Income Growth,Conservative,(ASISA) South African MA Income
+14,BKA Wealth,BKA Wealth Moderate Growth,Moderate,(ASISA) South African MA Medium Equity
+16,BKA Wealth,BKA Wealth Moderate Growth TFSA,Moderate,(ASISA) South African MA Medium Equity
+17,BKA Wealth,BKA Wealth Offshore,Aggressive,(ASISA) Wwide MA Flexible
+19,BKA Wealth,BKA Wealth TFSA,Aggressive,(ASISA) Wwide MA Flexible
+20,Clamart Wealth,Clamart Wealth Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+21,Clamart Wealth,Clamart Wealth Conservative,Conservative,(ASISA) South African MA Income
+22,Clamart Wealth,Clamart Wealth Global Balanced,Global Moderate,EAA Fund USD Moderate Allocation
+23,Clamart Wealth,Clamart Wealth Global Balanced,Global Moderate,EAA Fund USD Moderate Allocation
+24,Clamart Wealth,Clamart Wealth Global Growth,Global Aggressive,EAA Fund USD Aggressive Allocation
+25,Clamart Wealth,Clamart Wealth Global Growth,Global Aggressive,EAA Fund USD Aggressive Allocation
+26,Clamart Wealth,Clamart Wealth Global Stable,Global Cautious,EAA Fund USD Cautious Allocation
+27,Clamart Wealth,Clamart Wealth Global Stable,Global Cautious,EAA Fund USD Cautious Allocation
+28,Clamart Wealth,Clamart Wealth Moderate,Moderate,(ASISA) South African MA Medium Equity
+29,Clamart Wealth,Clamart Wealth Stable,Cautious,(ASISA) South African MA Low Equity
+30,Clamart Wealth,Clamart Wealth Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+31,Delta,Delta Boutique Plus Wrap Fund,Moderate Aggressive,(ASISA) South African MA High Equity
+32,Delta,Delta Cautious Plus Wrap Fund,Cautious,(ASISA) South African MA Low Equity
+33,Delta,Delta Flexible Plus Wrap Fund,Moderate Aggressive,(ASISA) South African MA High Equity
+34,Delta,Delta Global Plus,Aggressive,(ASISA) Wwide MA Flexible
+35,Delta,Delta Global Plus Wrap Fund,Aggressive,(ASISA) Wwide MA Flexible
+36,Delta,Delta Growth Hedge Fund Plus,Aggressive,(ASISA) South African MA High Equity
+37,Delta,Delta Growth Hedge Fund Plus,Aggressive,(ASISA) South African MA High Equity
+38,Delta,Delta Growth Hedge Fund Plus 2,Aggressive,(ASISA) South African MA High Equity
+39,Delta,Delta Income Plus Wrap Fund,Conservative,(ASISA) South African MA Income
+40,Delta,Delta Moderate Plus,Moderate Aggressive,(ASISA) South African MA High Equity
+41,Delta,Delta Moderate Plus Wrap Fund,Moderate Aggressive,(ASISA) South African MA High Equity
+42,Delta,Delta Senator Plus,Moderate,(ASISA) South African MA Medium Equity
+43,Delta,Delta Senator Plus Wrap Fund,Moderate,(ASISA) South African MA Medium Equity
+44,Fiducia Wealth (Pty) Ltd,Fiducia High Equity,Moderate Aggressive,(ASISA) South African MA High Equity
+45,Fiducia Wealth (Pty) Ltd,Fiducia Low Equity,Cautious,(ASISA) South African MA Low Equity
+46,Fiducia Wealth (Pty) Ltd,Fiducia Medium Equity,Moderate,(ASISA) South African MA Medium Equity
+47,Fiducia Wealth (Pty) Ltd,Fiducia Wealth High Equity,Moderate Aggressive,(ASISA) South African MA High Equity
+48,Fiducia Wealth (Pty) Ltd,Fiducia Wealth Low Equity,Cautious,(ASISA) South African MA Low Equity
+49,Fiducia Wealth (Pty) Ltd,Fiducia Wealth Medium Equity,Moderate,(ASISA) South African MA Medium Equity
+50,Fiducia Wealth (Pty) Ltd,Fiducia Wealth Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+51,Fiducia Wealth (Pty) Ltd,Fiducia Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+52,Fiscal Tree,Fiscal Tree Assertive,Moderate Aggressive,(ASISA) South African MA High Equity
+53,Fiscal Tree,Fiscal Tree Conservative,Cautious,(ASISA) South African MA Low Equity
+54,Fiscal Tree,Fiscal Tree Moderate,Moderate,(ASISA) South African MA Medium Equity
+55,Graviton,Graviton SCI Balanced Fund,Moderate Aggressive,(ASISA) South African MA High Equity
+56,Graviton,Graviton SCI Flexible Income Fund,Conservative,(ASISA) South African MA Income
+57,Graviton,Graviton SCI Low Equity Fund,Cautious,(ASISA) South African MA Low Equity
+58,Graviton,Graviton SCI Medium Equity Fund,Moderate,(ASISA) South African MA Medium Equity
+59,Graviton Absolute Funds,Graviton Absolute CPI+3,Cautious,(ASISA) South African MA Low Equity
+60,Graviton Absolute Funds,Graviton Absolute CPI+4,Moderate,(ASISA) South African MA Medium Equity
+61,Graviton Absolute Funds,Graviton Absolute CPI+5,Moderate Aggressive,(ASISA) South African MA High Equity
+62,Graviton Global Funds,GL Global Balanced,Global Moderate,EAA Fund USD Moderate Allocation
+63,Graviton Global Funds,GL Global Growth,Global Aggressive,EAA Fund USD Aggressive Allocation
+64,Graviton Global Funds,GL Global Stable,Global Cautious,EAA Fund USD Cautious Allocation
+65,Graviton Global Funds,Graviton Global Balanced,Global Moderate,EAA Fund USD Moderate Allocation
+66,Graviton Global Funds,Graviton Global Balanced Tracker,Global Moderate,EAA Fund USD Moderate Allocation
+67,Graviton Global Funds,Graviton Global Growth,Global Aggressive,EAA Fund USD Aggressive Allocation
+68,Graviton Global Funds,Graviton Global Growth Tracker,Global Aggressive,EAA Fund USD Aggressive Allocation
+69,Graviton Global Funds,Graviton Global Stable,Global Cautious,EAA Fund USD Cautious Allocation
+70,Graviton Global Funds,Graviton Global Stable Tracker,Global Cautious,EAA Fund USD Cautious Allocation
+71,Graviton Hedge Funds,Graviton Aggressive Hedge,Aggressive,(ASISA) South African MA High Equity
+72,Graviton Hedge Funds,Graviton Cautious Hedge,Cautious,(ASISA) South African MA Low Equity
+73,Graviton Hedge Funds,Graviton Moderate Hedge,Moderate,(ASISA) South African MA Medium Equity
+74,Graviton Hybrid Funds,Graviton Hybrid High Equity,Moderate Aggressive,(ASISA) South African MA High Equity
+75,Graviton Hybrid Funds,Graviton Hybrid Low Equity,Cautious,(ASISA) South African MA Low Equity
+76,Graviton Hybrid Funds,Graviton Hybrid Medium Equity,Moderate,(ASISA) South African MA Medium Equity
+77,Graviton Hybrid Funds,Graviton Hybrid Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+78,Graviton Hybrid Funds,Graviton Hybrid Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+79,Graviton Hybrid Funds,Graviton Worldwide Flexible TFSA,Aggressive,(ASISA) Wwide MA Flexible
+80,Graviton Offshore (Franchises),Privado Global Balanced (USD),Global Moderate Aggressive,EAA Fund USD Aggressive Allocation
+81,Graviton Offshore (Franchises),Privado Global Equity (USD),Global Aggressive,EAA Fund USD Aggressive Allocation
+82,Graviton Offshore (Franchises),Privado Global Income (USD),Global Conservative,EAA Fund USD Diversified Bond - Short Term
+83,Graviton Retirement Solution,Graviton 2.5% Retirement Income,Conservative,(ASISA) South African MA Income
+84,Graviton Retirement Solution,Graviton 3.0% Retirement Income,Cautious,(ASISA) South African MA Low Equity
+85,Graviton Retirement Solution,Graviton 4.0% Retirement Income,Moderate,(ASISA) South African MA Medium Equity
+86,Graviton Retirement Solution,Graviton 5.0% Retirement Income,Moderate Aggressive,(ASISA) South African MA High Equity
+87,Graviton Retirement Solution,Graviton 6.0% Retirement Income,Aggressive,(ASISA) Wwide MA Flexible
+88,Graviton Shariah Funds,Graviton Shariah Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+89,Graviton Shariah Funds,Graviton Shariah Equity,Aggressive,SA Equity 
+90,Graviton Shariah Funds,Graviton Shariah Stable,Cautious,(ASISA) South African MA Low Equity
+91,Graviton Wealth,Graviton Wealth Management Flexible Growth,Aggressive,(ASISA) Wwide MA Flexible
+92,Graviton Wealth,Graviton Wealth Management Flexible Income,Conservative,(ASISA) South African MA Income
+93,Graviton Wealth,Graviton Wealth Management Managed,Moderate Aggressive,(ASISA) South African MA High Equity
+94,Graviton Wealth,Graviton Wealth Management Stable,Cautious,(ASISA) South African MA Low Equity
+95,Graviton Wealth (Franchises),Graviton Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+97,Graviton Wealth (Franchises),Graviton Cautious,Cautious,(ASISA) South African MA Low Equity
+98,Graviton Wealth (Franchises),Graviton Cautious (GLC),Cautious,(ASISA) South African MA Low Equity
+99,Graviton Wealth (Franchises),Graviton Flexible Growth,Aggressive,(ASISA) Wwide MA Flexible
+100,Graviton Wealth (Franchises),Graviton Flexible Growth (GLC),Aggressive,(ASISA) Wwide MA Flexible
+101,Graviton Wealth (Franchises),Graviton Wealth Creator,Moderate Aggressive,(ASISA) South African MA High Equity
+102,Graviton Wealth (Franchises),Graviton Wealth Defender,Cautious,(ASISA) South African MA Low Equity
+103,Graviton Wealth (Franchises),HP Aggressive,Aggressive,(ASISA) Wwide MA Flexible
+104,Graviton Wealth (Franchises),HP Cautious,Cautious,(ASISA) South African MA Low Equity
+105,Graviton Wealth (Franchises),HP Conservative,Conservative,(ASISA) South African MA Income
+106,Graviton Wealth (Franchises),HP Contractual Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity
+107,Graviton Wealth (Franchises),HP Discretionary Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity
+108,Graviton Wealth (Franchises),HP Moderate,Moderate,(ASISA) South African MA Medium Equity
+109,Graviton Wealth (Franchises),Infinitum Cautious,Cautious,(ASISA) South African MA Low Equity
+110,Graviton Wealth (Franchises),Infinitum Moderate,Moderate,(ASISA) South African MA Medium Equity
+111,Graviton Wealth (Franchises),Infinitum Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity
+112,Graviton Wealth (Franchises),Infinitum Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+113,Graviton Wealth (Franchises),Privado Conservative,Conservative,(ASISA) South African MA Income
+114,Graviton Wealth (Franchises),Privado Flexible,Aggressive,(ASISA) Wwide MA Flexible
+115,Graviton Wealth (Franchises),Privado Growth,Moderate Aggressive,(ASISA) South African MA High Equity
+116,Graviton Wealth (Franchises),Privado Income,Conservative,(ASISA) South African MA Income
+117,Graviton Wealth (Franchises),Privado Moderate,Moderate,(ASISA) South African MA Medium Equity
+118,Graviton Wealth (Franchises),Privado Moderate Hedge,Moderate,(ASISA) South African MA Medium Equity
+119,Graviton Wealth (Franchises),Privado Shariah Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+120,Graviton Wealth (Franchises),Privado TFSA Equity,Aggressive,(ASISA) South African MA High Equity
+121,Graviton Wealth (Franchises),Privado TFSA Equity,Aggressive,(ASISA) Wwide MA Flexible
+122,Graviton Wealth Management,Graviton Wealth Management Managed,Moderate Aggressive,(ASISA) South African MA High Equity
+123,Graviton Wealth Management,Graviton Wealth Management Stable,Cautious,(ASISA) South African MA Low Equity
+124,Guardian,Guardian Aggressive Fund,Aggressive,(ASISA) Wwide MA Flexible
+125,Guardian,Guardian Cautious Fund,Cautious,(ASISA) South African MA Low Equity
+126,Guardian,Guardian Flexible Income Fund,Conservative,(ASISA) South African MA Income
+127,Guardian,Guardian Moderate Aggressive Fund,Moderate Aggressive,(ASISA) South African MA High Equity
+128,Henceforward,Henceforward Flexible Income,Conservative,(ASISA) South African MA Income
+129,Henceforward,Henceforward Global Growth,Aggressive,(ASISA) Wwide MA Flexible
+130,Henceforward,Henceforward Wealth Accelerator,Aggressive,(ASISA) Wwide MA Flexible
+131,Henceforward,Henceforward Wealth Accelerator,Aggressive,(ASISA) Wwide MA Flexible
+132,Henceforward,Henceforward Wealth Creator,Moderate Aggressive,(ASISA) South African MA High Equity
+133,Henceforward,Henceforward Wealth Mediator,Moderate,(ASISA) South African MA Medium Equity
+134,Henceforward,Henceforward Wealth Protector,Cautious,(ASISA) South African MA Low Equity
+135,Innovate Solutions Group (Pty) Ltd,Innovate Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+136,Innovate Solutions Group (Pty) Ltd,Innovate Conservative,Conservative,(ASISA) South African MA Income
+137,Innovate Solutions Group (Pty) Ltd,Innovate Global Balanced,Global Moderate,EAA Fund USD Moderate Allocation
+138,Innovate Solutions Group (Pty) Ltd,Innovate Global Balanced,Global Moderate,EAA Fund USD Moderate Allocation
+139,Innovate Solutions Group (Pty) Ltd,Innovate Global Growth,Global Aggressive,EAA Fund USD Aggressive Allocation
+140,Innovate Solutions Group (Pty) Ltd,Innovate Global Growth,Global Aggressive,EAA Fund USD Aggressive Allocation
+141,Innovate Solutions Group (Pty) Ltd,Innovate Global Stable,Global Cautious,EAA Fund USD Cautious Allocation
+142,Innovate Solutions Group (Pty) Ltd,Innovate Global Stable,Global Cautious,EAA Fund USD Cautious Allocation
+143,Innovate Solutions Group (Pty) Ltd,Innovate Moderate,Moderate,(ASISA) South African MA Medium Equity
+144,Innovate Solutions Group (Pty) Ltd,Innovate Stable,Cautious,(ASISA) South African MA Low Equity
+145,Innovate Solutions Group (Pty) Ltd,Innovate Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+146,Jurien Jordaan,J3 Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+147,Jurien Jordaan,J3 Cautious,Cautious,(ASISA) South African MA Low Equity
+148,Jurien Jordaan,J3 Flexible,Aggressive,(ASISA) Wwide MA Flexible
+149,Jurien Jordaan,J3 Income,Conservative,(ASISA) South African MA Income
+150,Justin Frittelli,Justin Frittelli Hybrid High Equity,Moderate Aggressive,(ASISA) South African MA High Equity
+151,Justin Frittelli,Justin Frittelli Hybrid Low Equity,Cautious,(ASISA) South African MA Low Equity
+152,Justin Frittelli,Justin Frittelli Hybrid Medium Equity,Moderate,(ASISA) South African MA Medium Equity
+153,Justin Frittelli,Justin Frittelli Hybrid Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+154,Latitude Wealth,Latitude Wealth Aggressive,Aggressive,(ASISA) Wwide MA Flexible
+155,Latitude Wealth,Latitude Wealth Cautious,Cautious,(ASISA) South African MA Low Equity
+156,Latitude Wealth,Latitude Wealth Conservative,Conservative,(ASISA) South African MA Income
+157,Latitude Wealth,Latitude Wealth Moderate,Moderate,(ASISA) South African MA Medium Equity
+158,Latitude Wealth,Latitude Wealth Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity
+159,Luthuli Capital,Luthuli Capital Cautious,Cautious,(ASISA) South African MA Low Equity
+160,Luthuli Capital,Luthuli Capital Moderate,Moderate,(ASISA) South African MA Medium Equity
+161,Luthuli Capital,Luthuli Capital Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity
+162,Luthuli Capital,Luthuli Capital TFSA Growth,Aggressive,(ASISA) Wwide MA Flexible
+163,LW Funds,LW Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+164,LW Funds,LW Cautious,Cautious,(ASISA) South African MA Low Equity
+165,LW Funds,LW Flexible,Aggressive,(ASISA) Wwide MA Flexible
+166,LW Funds,LW Moderate,Moderate,(ASISA) South African MA Medium Equity
+167,Lynnwood Financial Services (Pty) Ltd,Lynnwood Flexible,Aggressive,(ASISA) Wwide MA Flexible
+168,Lynnwood Financial Services (Pty) Ltd,Lynnwood Moderate,Moderate,(ASISA) South African MA Medium Equity
+169,Lynnwood Financial Services (Pty) Ltd,Lynnwood Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity
+170,NLD,Asset Accelerator Inflation + 6%,Aggressive,(ASISA) Wwide MA Flexible
+171,NLD,Asset Accumulator Inflation + 5%,Moderate Aggressive,(ASISA) South African MA High Equity
+172,NLD,Asset Creator Inflation + 3%,Cautious,(ASISA) South African MA Low Equity
+173,NLD,Asset Protector Cash + 1%,Conservative,(ASISA) South African MA Income
+174,NLD,Tax Free Investment,Aggressive,(ASISA) Wwide MA Flexible
+175,Optimate,Optimate Max 20,Conservative,(ASISA) South African MA Income
+176,Optimate,Optimate Max 40,Cautious,(ASISA) South African MA Low Equity
+177,Optimate,Optimate Max 60,Moderate,(ASISA) South African MA Medium Equity
+178,Optimate,Optimate Max 75,Moderate Aggressive,(ASISA) South African MA High Equity
+179,Optimate,Optimate Maximiser,Moderate Aggressive,(ASISA) South African MA High Equity
+180,Optimate,Optimate Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+181,PSG Wealth Bryanston,PSG Bryanston Cautious,Cautious,(ASISA) South African MA Low Equity
+182,PSG Wealth Bryanston,PSG Bryanston Flexible Income,Conservative,(ASISA) South African MA Income
+183,PSG Wealth Bryanston,PSG Bryanston Moderate,Moderate,(ASISA) South African MA Medium Equity
+184,PSG Wealth Bryanston,PSG Bryanston Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity
+185,PSG Wealth Bryanston,PSG Bryanston Moderate ILLA,Moderate,(ASISA) South African MA Medium Equity
+186,Rebalance,Rebalance SCI Balanced Fund of Funds,Moderate Aggressive,(ASISA) South African MA High Equity
+187,Rebalance,Rebalance SCI Cautious Fund of Funds,Cautious,(ASISA) South African MA Low Equity
+188,Rebalance,Rebalance SCI Real Income Fund,Conservative,(ASISA) South African MA Income
+189,Rebalance,Rebalance SCI Worldwide Flexible Fund of Funds,Aggressive,(ASISA) Wwide MA Flexible
+190,Sanlam Multi Manager International,BIV Graviton Aggressive Hedge,Aggressive,(ASISA) South African MA High Equity
+191,Sanlam Multi Manager International,BIV Graviton Cautious Hedge,Cautious,(ASISA) South African MA Low Equity
+192,Sanlam Multi Manager International,BIV Graviton Moderate Hedge,Moderate,(ASISA) South African MA Medium Equity
+193,Victory House,Victory House Cautious Hedge,Cautious,(ASISA) South African MA Low Equity
+194,Victory House,Victory House Enhanced Income,Conservative,(ASISA) South African MA Income
+195,Victory House,Victory House Flexible,Moderate Aggressive,(ASISA) South African MA High Equity
+196,Victory House,Victory House Inflation Plus,Moderate,(ASISA) South African MA Medium Equity
+197,Victory House,Victory House Moderate Hedge,Moderate,(ASISA) South African MA Medium Equity
+198,Victory House,Victory House TFSA,Aggressive,(ASISA) Wwide MA Flexible
+199,Wealth Design,Wealth Design Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+200,Wealth Design,Wealth Design Flexible Income,Conservative,(ASISA) South African MA Income
+201,Wealth Design,Wealth Design Global Equity Feeder,Aggressive,(ASISA) Wwide MA Flexible
+202,Wealth Design,Wealth Design Moderate,Moderate,(ASISA) South African MA Medium Equity
+203,Wealth Design,Wealth Design Stable,Cautious,(ASISA) South African MA Low Equity
+204,Wealth Design,Wealth Design TFSA,Aggressive,(ASISA) Wwide MA Flexible
+205,Wealth Design,Wealth Design TFSA Balanced,Moderate Aggressive,(ASISA) South African MA High Equity
+206,Wealth Design,Wealth Design Worldwide Flexible,Aggressive,(ASISA) Wwide MA Flexible
+207,Zingitwa Wealth,Zingitwa Wealth Conservative,Conservative,(ASISA) South African MA Income
+208,Zingitwa Wealth,Zingitwa Wealth Moderate,Moderate,(ASISA) South African MA Medium Equity
+209,Zingitwa Wealth,Zingitwa Wealth Moderate Aggressive,Moderate Aggressive,(ASISA) South African MA High Equity

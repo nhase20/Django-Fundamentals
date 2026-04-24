@@ -3,59 +3,123 @@
 {% block content %}
 
 <div class="card">
-    <h1>About Multi-Manager</h1>
+    <h1>About the Financial Solution Predictor</h1>
 
     <p>
-        Multi-management is an investment strategy where Your assets are allocated
-        across multiple specialist managers within an organization. Each manager is
-        selected based on performance metrics and expertise to meet specific client goals.
+        Cuurently the main purpose of this app is to represent a workflow system that 
+        simulates an advisor's screening process. The action is presumed to start when 
+        an advisor has most of the client's information is finding a portfolio that might 
+        match the client.
     </p>
 
     <p>
-        This approach improves risk management by diversifying investments across
-        different strategies instead of relying on a single manager. As a result,
-        returns tend to be more stable and less volatile over time.
+        The following system will consider the following parameters:
     </p>
-
-    <p>
-        By hiring specialist managers for different asset classes, the system benefits
-        from diverse perspectives and expertise. However, careful selection is required
-        to balance performance and management costs.
-    </p>
-
-    <h2>Clients</h2>
-
-    <p>
-        A Discretionary Fund Manager (DFM) manages portfolios on behalf of clients
-        with full decision-making authority, allowing faster execution of investment strategies.
-    </p>
-
     <ul>
-        <li><strong>Retail Clients-:</strong> Individuals investing personal funds, often relying on expert management.
-        </li>
-        <li><strong>Institutional Clients-:</strong> Organizations like pension funds managing large capital with greater
-            control over strategies.</li>
+        <li>Risk Profile</li>
+        <li>Risk Tolerance</li>
+        <li>Risk Rating</li>
     </ul>
 
-    <h2>Asset Classes</h2>
-
     <p>
-        Asset classes are groups of investments that have similar attributes ad behave similarly under the same laws and
-        regulations in the market. There is sometimes little or negative correlation between asset classes. These investment
-        classes are tangible and intangible instruments that investors buy up to make profit in the long or short-term basis.
-        With managers investing in these different classes they ensure diversification reducing risk and most importantly
-        increasing profit
+        The system should work as follows:
+        Take in this input and then convert it into a structured risk score, then map the scores to the following ASISA
+        categories.
     </p>
 
-    <ul>
-        <li><strong>Equities:</strong> Ownership in companies, high growth potential.</li>
-        <li><strong>Fixed Income:</strong> Loans generating stable interest income.</li>
-        <li><strong>Real Estate:</strong> Property investments with long-term appreciation.</li>
-        <li><strong>Cash:</strong> Liquid and safe but low returns.</li>
-        <li><strong>Commodities:</strong> Assets like gold and oil, useful for inflation protection.</li>
-        <li><strong>Alternatives:</strong> Crypto, hedge funds, private equity (higher risk/reward).</li>
-    </ul>
+    <h2>Overview</h2>
 
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+    
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+    
+        th {
+            background-color: #f4f4f4;
+        }
+    
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+    </style>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Risk Rating</th>
+                <th>Category / Risk Tolerance</th>
+                <th>Risk Profile</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1 (Low)</td>
+                <td>
+                    <ul>
+                        <li>Money Market</li>
+                        <li>(ASISA) SA Multi-Asset Income</li>
+                        <li>USD Cash</li>
+                        <li>EAA Fund USD Cautious Allocation</li>
+                    </ul>
+                </td>
+                <td>Conservative</td>
+            </tr>
+    
+            <tr>
+                <td>2 (Low-Medium)</td>
+                <td>
+                    <ul>
+                        <li>SA Multi-Asset Income (30%) / Low Equity (70%)</li>
+                        <li>(ASISA) SA Multi-Asset Low Equity</li>
+                        <li>EAA Fund USD Moderate Allocation</li>
+                    </ul>
+                </td>
+                <td>Moderate</td>
+            </tr>
+    
+            <tr>
+                <td>3 (Medium)</td>
+                <td>
+                    <ul>
+                        <li>(ASISA) SA Multi-Asset Medium Equity</li>
+                    </ul>
+                </td>
+                <td>Moderate Aggressive</td>
+            </tr>
+    
+            <tr>
+                <td>4 (High)</td>
+                <td>
+                    <ul>
+                        <li>(ASISA) SA Multi-Asset High Equity</li>
+                        <li>EAA Fund USD Aggressive Allocation</li>
+                        <li>SA Equity</li>
+                        <li>International Equity (ZAR)</li>
+                        <li>Worldwide Multi-Asset Flexible</li>
+                    </ul>
+                </td>
+                <td>Aggressive</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>
+        Depending on Client Group.
+    </p>
+    <ul>
+        <li>Portfolio Recommended = Client Group + Name</li>
+    </ul>
 </div>
 
 {% endblock %}

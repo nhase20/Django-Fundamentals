@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from .forms import ClientForm
 from .models import Portfolio, AssetManaged, Profile
+from .automations import retail_asset_allocation 
+import json 
 
 # Method to onboard clients into the app (Information), 
 def onboarding(request):
@@ -83,10 +85,16 @@ def dashboard(request):
     client = request.user.profile.client
     portfolio, created = Portfolio.objects.get_or_create(client=client)
     assets = AssetManaged.objects.filter(portfolio=portfolio)
+    recommended_portfolios = portfolio.portfolioName(client)
+
+    allocation = retail_asset_allocation(client)
+    allocation_json = json.dumps(allocation)
 
     context = {
         'client': client,
         'portfolio': portfolio,
+        'recommended_portfolios': recommended_portfolios,
+        'allocation_json': allocation_json,
         'assets': assets
     }
     # After getting info move to Retail dashboard template
