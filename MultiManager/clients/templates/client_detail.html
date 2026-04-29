@@ -1,0 +1,643 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<style>
+    .cd-header {
+        margin: 36px 0 28px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .cd-header-left .eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: #2ec4b6;
+        margin-bottom: 6px;
+    }
+
+    .cd-header-left h1 {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin: 0 0 4px;
+    }
+
+    .cd-header-left p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .cd-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .btn-teal {
+        background: #2ec4b6;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        display: inline-block;
+        transition: background .2s, transform .15s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-teal:hover {
+        background: #1a1a1a;
+        transform: translateY(-1px);
+    }
+
+    .btn-dark {
+        background: #1a1a1a;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        display: inline-block;
+        transition: background .2s;
+    }
+
+    .btn-dark:hover {
+        background: #2ec4b6;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid #e2e8f0;
+        color: #475569;
+        padding: 9px 18px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-block;
+        transition: border-color .2s;
+    }
+
+    .btn-outline:hover {
+        border-color: #2ec4b6;
+        color: #1a1a1a;
+    }
+
+    .info-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 32px;
+    }
+
+    .info-pill {
+        background: #fff;
+        border-radius: 100px;
+        padding: 8px 18px;
+        font-size: 13px;
+        color: #334155;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, .06);
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .info-pill .pill-label {
+        color: #94a3b8;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .info-pill .pill-value {
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .risk-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+    }
+
+    .risk-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #1a1a1a;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 100px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .risk-badge .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #2ec4b6;
+    }
+
+    .asisa-badge {
+        display: inline-flex;
+        align-items: center;
+        background: #f0fafa;
+        border: 2px solid #2ec4b6;
+        color: #0f766e;
+        padding: 10px 20px;
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0 0 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .section-title a {
+        font-size: 13px;
+        font-weight: 600;
+        color: #2ec4b6;
+        text-decoration: none;
+    }
+
+    .section-title a:hover {
+        text-decoration: underline;
+    }
+
+    .card-box {
+        background: #fff;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, .06);
+        margin-bottom: 24px;
+    }
+
+    .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 640px) {
+        .two-col {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .chart-wrap {
+        position: relative;
+        height: 220px;
+    }
+
+    .insight-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+    }
+
+    .insight-card {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 18px;
+        border-left: 4px solid #2ec4b6;
+    }
+
+    .insight-card .i-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #94a3b8;
+        margin-bottom: 4px;
+    }
+
+    .insight-card .i-value {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+    }
+
+    .insight-card .i-desc {
+        font-size: 12px;
+        color: #64748b;
+        line-height: 1.4;
+    }
+
+    .ptable {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .ptable th {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #94a3b8;
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .ptable td {
+        padding: 12px;
+        font-size: 13px;
+        color: #334155;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .ptable tr:last-child td {
+        border-bottom: none;
+    }
+
+    .empty-mini {
+        text-align: center;
+        padding: 32px;
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    .empty-mini .em-icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .source-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 18px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .source-banner.group {
+        background: #f0fdf4;
+        border: 1px solid #86efac;
+        color: #166534;
+    }
+
+    .source-banner.graviton {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        color: #92400e;
+    }
+
+    .alloc-bar {
+        display: flex;
+        height: 12px;
+        border-radius: 100px;
+        overflow: hidden;
+        margin: 12px 0 6px;
+    }
+
+    .alloc-seg {
+        transition: width .4s ease;
+    }
+
+    .alloc-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .alloc-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #475569;
+    }
+
+    .legend-item strong {
+        color: #1a1a1a;
+    }
+</style>
+
+<div class="cd-header">
+    <div class="cd-header-left">
+        <div class="eyebrow">Client Profile</div>
+        <h1>{{ client.name }}</h1>
+        <p>{{ client.client_group }} · Age {{ client.age }} · {{ client.time_horizon }}-year horizon</p>
+    </div>
+    <div class="cd-actions">
+        <a href="{% url 'advisor_dashboard' %}" class="btn-outline">← Dashboard</a>
+        <a href="{% url 'edit_client' client.id %}" class="btn-teal">✏️ Edit Client</a>
+        <a href="{% url 'add_portfolio' client.id %}" class="btn-dark">+ Add Portfolio</a>
+    </div>
+</div>
+
+<div class="risk-row">
+    <div class="risk-badge"><span class="dot"></span>{{ client.risk_profile|default:"—" }}</div>
+    <div class="asisa-badge">{{ client.risk_tolerance|default:"—" }}</div>
+</div>
+
+<div class="info-strip">
+    <div class="info-pill">
+        <span class="pill-label">Goal</span>
+        <span class="pill-value">{{ client.investment_goal|default:"—"|title }}</span>
+    </div>
+
+    <div class="info-pill">
+        <span class="pill-label">Horizon</span>
+        <span class="pill-value">{{ client.time_horizon|default:"—" }} years</span>
+    </div>
+
+    <div class="info-pill">
+        <span class="pill-label">Risk Rating</span>
+        <span class="pill-value">{{ client.risk_rating|default:"—"|title }}</span>
+    </div>
+
+    <div class="info-pill">
+        <span class="pill-label">Group</span>
+        <span class="pill-value">{{ client.client_group|default:"—"|title }}</span>
+    </div>
+</div>
+
+<div class="two-col">
+    <div class="card-box">
+        <div class="section-title">Asset Allocation</div>
+        <p style="font-size:13px;color:#64748b;margin:0 0 14px;">Estimated allocation based on risk profile, time
+            horizon, and rating. Updates automatically when client data changes.</p>
+        <div class="chart-wrap">
+            <canvas id="allocChart"></canvas>
+        </div>
+        <div class="alloc-bar" id="allocBar"></div>
+        <div class="alloc-legend" id="allocLegend"></div>
+    </div>
+
+    <div class="card-box">
+        <div class="section-title">Risk Profile Explanation</div>
+    
+        <div style="display:flex; flex-direction:column; gap:14px; font-size:14px; color:#475569; line-height:1.5;">
+    
+            <div>
+                <strong style="color:#1a1a1a;">Risk Profile:</strong>
+                {{ client.risk_profile|default:"—"|title }}<br>
+                <span style="font-size:13px;color:#64748b;">
+                    {% if client.risk_profile == "Conservative" %}
+                    Focuses on preserving capital with minimal volatility. Suitable for short-term or low-risk investors.
+                    {% elif client.risk_profile == "Moderate" %}
+                    Balances growth and stability. Accepts some market fluctuations for better long-term returns.
+                    {% elif client.risk_profile == "Aggressive" %}
+                    Targets high growth with significant market exposure and volatility.
+                    {% else %}
+                    This profile reflects the client’s overall tolerance for investment risk.
+                    {% endif %}
+                </span>
+            </div>
+    
+            <div>
+                <strong style="color:#1a1a1a;">Time Horizon:</strong>
+                {{ client.time_horizon|default:"—" }} years<br>
+                <span style="font-size:13px;color:#64748b;">
+                    {% if client.time_horizon <= 3 %} Short-term horizon — prioritises capital preservation and liquidity.
+                        {% elif client.time_horizon <= 7 %} Medium-term horizon — allows moderate exposure to growth assets.
+                        {% else %} Long-term horizon — enables higher allocation to growth assets like equities. {% endif %}
+                        </span>
+            </div>
+    
+            <div>
+                <strong style="color:#1a1a1a;">Risk Rating:</strong>
+                {{ client.risk_rating|default:"—"|title }}<br>
+                <span style="font-size:13px;color:#64748b;">
+                    Indicates how aggressively the portfolio can be positioned within its asset class.
+                </span>
+            </div>
+    
+            <div>
+                <strong style="color:#1a1a1a;">Investment Goal:</strong>
+                {{ client.investment_goal|default:"—"|title }}<br>
+                <span style="font-size:13px;color:#64748b;">
+                    Defines the primary objective driving portfolio construction (e.g., income, growth, or preservation).
+                </span>
+            </div>
+    
+        </div>
+    </div>
+</div>
+
+<div class="card-box">
+    <div class="section-title">Key Insights</div>
+    <div class="insight-grid">
+        {% for insight in insights %}
+        <div class="insight-card">
+            <div class="i-label">{{ insight.label }}</div>
+            <div class="i-value">{{ insight.value }}</div>
+            <div class="i-desc">{{ insight.explanation }}</div>
+        </div>
+        {% empty %}
+        <div class="empty-mini">
+            <div class="em-icon">📊</div>No insights available.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card-box">
+    <div class="section-title">
+        Saved Portfolios
+        <a href="{% url 'add_portfolio' client.id %}">+ Add Portfolio</a>
+    </div>
+    {% if assigned_portfolios %}
+    <table class="ptable">
+        <thead>
+            <tr>
+                <th>Portfolio Name</th>
+                <th>Group</th>
+                <th>Category</th>
+                <th>Risk Profile</th>
+                <th>Fund Size</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in assigned_portfolios %}
+            <tr>
+                <td><strong>{{ p.name }}</strong></td>
+                <td>{{ p.client_group }}</td>
+                <td style="font-size:12px;">{{ p.fund_category }}</td>
+                <td>{{ p.risk_profile }}</td>
+                <td>{% if p.total_value %}R {{ p.total_value|floatformat:0 }}{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-mini">
+        <div class="em-icon">📂</div>
+        No portfolios saved yet. <a href="{% url 'add_portfolio' client.id %}"
+            style="color:#2ec4b6;font-weight:700;">Add one now →</a>
+    </div>
+    {% endif %}
+</div>
+
+{{ client.client_group|default:"—"|title }}
+<div class="card-box" style="margin-bottom:40px;">
+    <div class="section-title">Recommended Portfolios</div>
+    {% if source == 'group' %}
+    <div class="source-banner group">✅ &nbsp;<div><strong>Showing {{ client.client_group }} portfolios</strong> Matched
+            within the advisor's group.</div>
+    </div>
+    {% else %}
+    <div class="source-banner graviton">⚠️ &nbsp;<div><strong>No exact group match</strong> Showing alternative Graviton
+            solutions instead.</div>
+    </div>
+    {% endif %}
+
+    {% if recommended %}
+    <table class="ptable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Group</th>
+                <th>Category</th>
+                <th>Risk Profile</th>
+                <th>Fund Size</th>
+                <th>Assign</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in recommended %}
+            <tr>
+                <td><strong>{{ p.name }}</strong></td>
+                <td style="font-size:12px;">{{ p.client_group }}</td>
+                <td style="font-size:12px;">{{ p.fund_category }}</td>
+                <td>{{ p.risk_profile }}</td>
+                <td>{% if p.total_value %}R {{ p.total_value|floatformat:0 }}{% else %}—{% endif %}</td>
+                <td>
+                    <form method="POST" action="{% url 'add_portfolio' client.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="portfolio_id" value="{{ p.id }}">
+                        <button type="submit" class="btn-teal" style="padding:5px 14px;font-size:12px;">Assign</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-mini">
+        <div class="em-icon">📭</div>No matching portfolios found for this profile and category.
+    </div>
+    {% endif %}
+</div>
+{{ allocation_json|json_script:"alloc-data" }}
+
+<script>
+    const alloc = JSON.parse(document.getElementById('alloc-data').textContent || '{}');
+
+    // 🔥 Smart colour mapping
+    function getColour(key) {
+        const k = key.toLowerCase();
+
+        if (k.includes('equity')) return '#2ec4b6';
+        if (k.includes('bond')) return '#1a1a1a';
+        if (k.includes('cash')) return '#94a3b8';
+        if (k.includes('alt')) return '#f59e0b';
+
+        return '#e2e8f0';
+    }
+
+    const keys = Object.keys(alloc);
+
+    const labels = keys.map(k =>
+        k.charAt(0).toUpperCase() + k.slice(1)
+    );
+
+    // ✅ FIX: force numbers
+    const values = Object.values(alloc).map(v => Number(v));
+
+    const bgColours = keys.map(k => getColour(k));
+
+    // ✅ CHART
+    if (labels.length > 0) {
+        new Chart(document.getElementById('allocChart'), {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: bgColours,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    }
+
+    // ✅ ALLOCATION BAR + LEGEND (IMPORTANT FIX)
+    const bar = document.getElementById('allocBar');
+    const legend = document.getElementById('allocLegend');
+
+    if (bar && legend) {
+        bar.innerHTML = '';
+        legend.innerHTML = '';
+
+        keys.forEach((k, i) => {
+            const colour = getColour(k);
+            const value = values[i];
+            const label = labels[i];
+
+            // BAR SEGMENT
+            const seg = document.createElement('div');
+            seg.className = 'alloc-seg';
+            seg.style.width = value + '%';
+            seg.style.background = colour;
+            bar.appendChild(seg);
+
+            // LEGEND ITEM
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+
+            item.innerHTML = `
+                <div class="alloc-dot" style="background:${colour}"></div>
+                ${label}: <strong>${value}%</strong>
+            `;
+
+            legend.appendChild(item);
+        });
+    }
+
+    // OPTIONAL: remove radar chart completely if not used
+    // document.getElementById('radarChart')?.remove();
+</script>
+{% endblock %}

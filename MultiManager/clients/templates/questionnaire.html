@@ -1,0 +1,555 @@
+{% extends 'home.html' %}
+
+{% block content %}
+
+<style>
+    /* ── Step progress bar ── */
+    .progress-track {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin: 36px 0 48px;
+    }
+
+    .step-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        border: 3px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #94a3b8;
+        flex-shrink: 0;
+        transition: all .25s ease;
+    }
+
+    .step-dot.active {
+        background: #1a1a1a;
+        border-color: #1a1a1a;
+        color: #fff;
+    }
+
+    .step-dot.done {
+        background: #2ec4b6;
+        border-color: #2ec4b6;
+        color: #fff;
+    }
+
+    .step-line {
+        flex: 1;
+        height: 3px;
+        background: #e2e8f0;
+        transition: background .25s ease;
+    }
+
+    .step-line.done {
+        background: #2ec4b6;
+    }
+
+    /* ── Wrapper ── */
+    .q-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    /* ── Question cards ── */
+    .q-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 36px 40px;
+        box-shadow: 0 2px 24px rgba(0, 0, 0, .07);
+        display: none;
+        animation: fadeUp .3s ease forwards;
+    }
+
+    .q-card.active {
+        display: block;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .q-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: #2ec4b6;
+        margin-bottom: 8px;
+    }
+
+    .q-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0 0 28px;
+        line-height: 1.3;
+    }
+
+    /* ── Plain text inputs (name, age) ── */
+    .q-input {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color .2s;
+        margin-bottom: 0;
+    }
+
+    .q-input:focus {
+        border-color: #2ec4b6;
+    }
+
+    /* ── Choice tiles ── */
+    .choices {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .choice-label {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: border-color .2s, background .2s;
+        user-select: none;
+    }
+
+    .choice-label:hover {
+        border-color: #2ec4b6;
+        background: #f0fafa;
+    }
+
+    .choice-label input[type="radio"] {
+        display: none;
+    }
+
+    .choice-label.selected {
+        border-color: #1a1a1a;
+        background: #f8f8f8;
+    }
+
+    .choice-radio {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #cbd5e1;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color .2s;
+    }
+
+    .choice-label.selected .choice-radio {
+        border-color: #1a1a1a;
+        background: #1a1a1a;
+    }
+
+    .choice-label.selected .choice-radio::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #fff;
+    }
+
+    .choice-text strong {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .choice-text span {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    /* ── Navigation buttons ── */
+    .q-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 32px;
+    }
+
+    .btn-back {
+        background: none;
+        border: 2px solid #e2e8f0;
+        color: #64748b;
+        padding: 11px 24px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        width: auto;
+        transition: border-color .2s, color .2s;
+    }
+
+    .btn-back:hover {
+        border-color: #94a3b8;
+        color: #1a1a1a;
+    }
+
+    .btn-next {
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
+        padding: 13px 32px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        width: auto;
+        transition: background .2s, transform .15s;
+    }
+
+    .btn-next:hover {
+        background: #2ec4b6;
+        transform: translateY(-1px);
+    }
+
+    .btn-next:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ── Error message ── */
+    .q-error {
+        color: #dc2626;
+        font-size: 13px;
+        margin-top: 10px;
+        display: none;
+    }
+
+    .q-error.show {
+        display: block;
+    }
+
+    /* ── Section divider for personal info step ── */
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    .input-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 6px;
+    }
+
+    /* ── Credentials section ── */
+    .cred-hint {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 20px;
+        padding: 12px 16px;
+        background: #f1fefe;
+        border-left: 3px solid #2ec4b6;
+        border-radius: 4px;
+    }
+</style>
+
+<div class="q-wrapper">
+
+    <!-- Progress bar -->
+    <div class="progress-track">
+        <div class="step-dot active" id="dot-1">1</div>
+        <div class="step-line" id="line-1"></div>
+        <div class="step-dot" id="dot-2">2</div>
+        <div class="step-line" id="line-2"></div>
+        <div class="step-dot" id="dot-3">3</div>
+        <div class="step-line" id="line-3"></div>
+        <div class="step-dot" id="dot-4">4</div>
+        <div class="step-line" id="line-4"></div>
+        <div class="step-dot" id="dot-5">5</div>
+        <div class="step-line" id="line-5"></div>
+        <div class="step-dot" id="dot-6">6</div>
+        <div class="step-line" id="line-6"></div>
+    </div>
+
+    <form method="POST" id="q-form">
+        {% csrf_token %}
+
+        <!-- ── Step 1: Client details ── -->
+        <div class="q-card active" data-step="1">
+            <div class="q-label">Step 1 of 6 — Client Details</div>
+            <h2 class="q-title">Let's start with the basics.</h2>
+
+            <div class="input-group">
+                <label for="id_name">Client's full name</label>
+                <input class="q-input" type="text" name="name" id="id_name" placeholder="e.g. Jane Nkosi" required>
+            </div>
+            <div class="input-group">
+                <label for="id_age">Client's age</label>
+                <input class="q-input" type="number" name="age" id="id_age" placeholder="e.g. 42" min="18" max="120"
+                    required>
+            </div>
+            <p class="q-error" id="err-1">Please fill in both fields.</p>
+            <div class="q-nav">
+                <span></span>
+                <button type="button" class="btn-next" onclick="nextStep(1)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ── Step 2: Purpose ── -->
+        <div class="q-card" data-step="2">
+            <div class="q-label">Step 2 of 6 — Investment Purpose</div>
+            <h2 class="q-title">What is this money for?</h2>
+            <div class="choices">
+                <label class="choice-label">
+                    <input type="radio" name="purpose" value="retirement">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Retirement planning</strong>
+                        <span>Building a nest egg for life after work</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="purpose" value="education">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Education or a specific goal</strong>
+                        <span>A defined target within a set timeframe</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="purpose" value="wealth">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Long-term wealth building</strong>
+                        <span>Growing capital with no specific end date</span>
+                    </div>
+                </label>
+            </div>
+            <p class="q-error" id="err-2">Please select an option.</p>
+            <div class="q-nav">
+                <button type="button" class="btn-back" onclick="prevStep(2)">← Back</button>
+                <button type="button" class="btn-next" onclick="nextStep(2)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ── Step 3: Time horizon ── -->
+        <div class="q-card" data-step="3">
+            <div class="q-label">Step 3 of 6 — Time Horizon</div>
+            <h2 class="q-title">How long will this money be invested?</h2>
+            <div class="choices">
+                <label class="choice-label">
+                    <input type="radio" name="time_horizon" value="short">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Less than 5 years</strong>
+                        <span>Short-term — I may need access soon</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="time_horizon" value="medium">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>5 – 10 years</strong>
+                        <span>Medium-term — comfortable to leave it for a while</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="time_horizon" value="long">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>More than 10 years</strong>
+                        <span>Long-term — no rush to access this money</span>
+                    </div>
+                </label>
+            </div>
+            <p class="q-error" id="err-3">Please select an option.</p>
+            <div class="q-nav">
+                <button type="button" class="btn-back" onclick="prevStep(3)">← Back</button>
+                <button type="button" class="btn-next" onclick="nextStep(3)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ── Step 4: Emergency fund ── -->
+        <div class="q-card" data-step="4">
+            <div class="q-label">Step 4 of 6 — Financial Readiness</div>
+            <h2 class="q-title">Does the client have 3–6 months of emergency savings set aside?</h2>
+            <div class="choices">
+                <label class="choice-label">
+                    <input type="radio" name="emergency_fund" value="yes">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Yes</strong>
+                        <span>Emergency reserves are in place outside this investment</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="emergency_fund" value="no">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>No</strong>
+                        <span>This money may need to be accessed in an emergency</span>
+                    </div>
+                </label>
+            </div>
+            <p class="q-error" id="err-4">Please select an option.</p>
+            <div class="q-nav">
+                <button type="button" class="btn-back" onclick="prevStep(4)">← Back</button>
+                <button type="button" class="btn-next" onclick="nextStep(4)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ── Step 5: Volatility comfort ── -->
+        <div class="q-card" data-step="5">
+            <div class="q-label">Step 5 of 6 — Risk Comfort</div>
+            <h2 class="q-title">How does the client feel about investment ups and downs?</h2>
+            <div class="choices">
+                <label class="choice-label">
+                    <input type="radio" name="volatility_comfort" value="low">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Uncomfortable</strong>
+                        <span>Stability matters most — I don't want to see losses</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="volatility_comfort" value="medium">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Neutral</strong>
+                        <span>Some short-term dips are acceptable for better long-term returns</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="volatility_comfort" value="high">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Comfortable</strong>
+                        <span>I focus on the long term and can ride out volatility</span>
+                    </div>
+                </label>
+            </div>
+            <p class="q-error" id="err-5">Please select an option.</p>
+            <div class="q-nav">
+                <button type="button" class="btn-back" onclick="prevStep(5)">← Back</button>
+                <button type="button" class="btn-next" onclick="nextStep(5)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ── Step 6: Income or growth ── -->
+        <div class="q-card" data-step="6">
+            <div class="q-label">Step 6 of 6 — Objective</div>
+            <h2 class="q-title">Does the client need income from this investment, or pure growth?</h2>
+            <div class="choices">
+                <label class="choice-label">
+                    <input type="radio" name="income_or_growth" value="income">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Regular income</strong>
+                        <span>I need this investment to pay out regularly</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="income_or_growth" value="balanced">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>A mix of both</strong>
+                        <span>Some income is useful but growth matters too</span>
+                    </div>
+                </label>
+                <label class="choice-label">
+                    <input type="radio" name="income_or_growth" value="growth">
+                    <div class="choice-radio"></div>
+                    <div class="choice-text">
+                        <strong>Maximum growth</strong>
+                        <span>Reinvest everything — I don't need income right now</span>
+                    </div>
+                </label>
+            </div>
+            <p class="q-error" id="err-6">Please select an option.</p>
+            <div class="q-nav">
+                <button type="button" class="btn-back" onclick="prevStep(6)">← Back</button>
+                <button type="submit" class="btn-next">Calculate Risk Profile →</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    let current = 1;
+    const total = 6;
+
+    function updateProgress(step) {
+        for (let i = 1; i <= total; i++) {
+            const dot = document.getElementById('dot-' + i);
+            const line = document.getElementById('line-' + i);
+            if (i < step) { dot.className = 'step-dot done'; }
+            else if (i === step) { dot.className = 'step-dot active'; }
+            else { dot.className = 'step-dot'; }
+            if (line) { line.className = i < step ? 'step-line done' : 'step-line'; }
+        }
+    }
+
+    function nextStep(step) {
+        const err = document.getElementById('err-' + step);
+        if (step === 1) {
+            const name = document.getElementById('id_name').value.trim();
+            const age = document.getElementById('id_age').value.trim();
+            if (!name || !age) { err.classList.add('show'); return; }
+        }else {
+            const radios = document.querySelectorAll(
+                '.q-card[data-step="' + step + '"] input[type="radio"]'
+            );
+            const checked = [...radios].some(r => r.checked);
+            if (!checked) { err.classList.add('show'); return; }
+        }
+        err.classList.remove('show');
+
+        document.querySelector('.q-card[data-step="' + step + '"]').classList.remove('active');
+        current = step + 1;
+        document.querySelector('.q-card[data-step="' + current + '"]').classList.add('active');
+        updateProgress(current);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function prevStep(step) {
+        document.querySelector('.q-card[data-step="' + step + '"]').classList.remove('active');
+        current = step - 1;
+        document.querySelector('.q-card[data-step="' + current + '"]').classList.add('active');
+        updateProgress(current);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Highlight selected choice tiles
+    document.querySelectorAll('.choice-label').forEach(label => {
+        label.addEventListener('click', () => {
+            const name = label.querySelector('input').name;
+            document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                r.closest('.choice-label').classList.remove('selected');
+            });
+            label.classList.add('selected');
+        });
+    });
+</script>
+
+{% endblock %}

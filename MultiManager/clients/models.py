@@ -3,49 +3,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from .automations import retail_benchmark_selector,retail_asset_allocation
 
-# Retail Client data
-class Client(models.Model):
 
-        # How much risk the business is willing to take
-    # AFTER — stored values now exactly match Portfolio.risk_profile values from CSV
-    RISK_PROFILE = [
-        ('Conservative', 'Conservative'),
-        ('Aggressive', 'Aggressive'),
-        ('Moderate', 'Moderate'),
-        ('Moderate Aggressive', 'Moderate Aggressive'),
-        ('Global Moderate', 'Global Moderate'),
-        ('Global Moderate Aggressive', 'Global Moderate Aggressive'),
-        ('Global Aggressive', 'Global Aggressive'),
-        ('Global Cautious', 'Global Cautious'),
-        ('Global Conservative', 'Global Conservative'),
-        ('Cautious', 'Cautious'),
-    ]
-
-    # AFTER — stored values match Portfolio.fund_category values from CSV exactly
-    RISK_TOLERANCE = [
-        ('(ASISA) South African MA Income', '(ASISA) South African MA Income'),
-        ('(ASISA) South African MA Low Equity', '(ASISA) South African MA Low Equity'),
-        ('(ASISA) South African MA Medium Equity', '(ASISA) South African MA Medium Equity'),
-        ('(ASISA) South African MA High Equity', '(ASISA) South African MA High Equity'),
-        ('(ASISA) Wwide MA Flexible', '(ASISA) Wwide MA Flexible'),  # note: CSV spells it "Wwide"
-        ('EAA Fund USD Cautious Allocation', 'EAA Fund USD Cautious Allocation'),
-        ('EAA Fund USD Moderate Allocation', 'EAA Fund USD Moderate Allocation'),
-        ('EAA Fund USD Aggressive Allocation', 'EAA Fund USD Aggressive Allocation'),
-        ('EAA Fund USD Diversified Bond - Short Term', 'EAA Fund USD Diversified Bond - Short Term'),
-        ('SA Equity', 'SA Equity'),  # CSV has a trailing space — strip it in import_portfolios
-    ]
-
-    RISK_RATING = [
-        ('low', 'Low'),
-        ('pure equity', 'Pure Equity'),
-        ("low-medium", 'Low-Medium'),
-        ('medium', 'Medium'),
-        ("high", 'High'),
-        ('flexible','Flexible'),
-    ]
-
-    # AFTER — every stored value matches Client_Grouping in the CSV exactly
-    CLIENT_GROUP = [
+CLIENT_GROUP_CHOICES = [
         ('ACS','ACS'),
         ('BKA Wealth','BKA Wealth'),
         ('Clamart Wealth','Clamart Wealth'),
@@ -82,17 +41,59 @@ class Client(models.Model):
         ('Zingitwa Wealth','Zingitwa Wealth'),
         ('Other','Other'),
     ]
+
+# Retail Client data
+class Client(models.Model):
+
+    # How much risk the business is willing to take
+    # AFTER — stored values now exactly match Portfolio.risk_profile values from CSV
+    RISK_PROFILE = [
+        ('Conservative', 'Conservative'),
+        ('Aggressive', 'Aggressive'),
+        ('Moderate', 'Moderate'),
+        ('Moderate Aggressive', 'Moderate Aggressive'),
+        ('Global Moderate', 'Global Moderate'),
+        ('Global Moderate Aggressive', 'Global Moderate Aggressive'),
+        ('Global Aggressive', 'Global Aggressive'),
+        ('Global Cautious', 'Global Cautious'),
+        ('Global Conservative', 'Global Conservative'),
+        ('Cautious', 'Cautious'),
+    ]
+
+    # AFTER — stored values match Portfolio.fund_category values from CSV exactly
+    RISK_TOLERANCE = [
+        ('(ASISA) South African MA Income', '(ASISA) South African MA Income'),
+        ('(ASISA) South African MA Low Equity', '(ASISA) South African MA Low Equity'),
+        ('(ASISA) South African MA Medium Equity', '(ASISA) South African MA Medium Equity'),
+        ('(ASISA) South African MA High Equity', '(ASISA) South African MA High Equity'),
+        ('(ASISA) Wwide MA Flexible', '(ASISA) Wwide MA Flexible'),  # note: CSV spells it "Wwide"
+        ('EAA Fund USD Cautious Allocation', 'EAA Fund USD Cautious Allocation'),
+        ('EAA Fund USD Moderate Allocation', 'EAA Fund USD Moderate Allocation'),
+        ('EAA Fund USD Aggressive Allocation', 'EAA Fund USD Aggressive Allocation'),
+        ('EAA Fund USD Diversified Bond - Short Term', 'EAA Fund USD Diversified Bond - Short Term'),
+        ('SA Equity', 'SA Equity'),  # CSV has a trailing space — strip it in import_portfolios
+    ]
+
+    RISK_RATING = [
+        ('low', 'Low'),
+        ('pure equity', 'Pure Equity'),
+        ("low-medium", 'Low-Medium'),
+        ('medium', 'Medium'),
+        ("high", 'High'),
+        ('flexible','Flexible'),
+    ]
     # user instance which has a one-to-one reltionship with profile 
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     # A few details that can be used to create a suggestion to the user and create a custom dashboard
     name = models.CharField(max_length=100,default="user")
-    risk_rating = models.CharField(choices=RISK_RATING)
+    risk_rating = models.CharField(choices=RISK_RATING,blank=True)
     age = models.PositiveIntegerField(default=18)
-    risk_tolerance = models.CharField(choices= RISK_TOLERANCE)
+    risk_tolerance = models.CharField(choices= RISK_TOLERANCE,blank=True)
     investment_goal = models.CharField(max_length=100,default="None")
     time_horizon = models.PositiveBigIntegerField()
-    risk_profile = models.CharField(choices=RISK_PROFILE)
-    client_group = models.CharField(choices=CLIENT_GROUP,default="other")
+    risk_profile = models.CharField(choices=RISK_PROFILE,blank=True)
+    client_group = models.CharField(choices=CLIENT_GROUP_CHOICES,default="other",blank=True)
+    advisor = models.ForeignKey('Advisor', null=True, blank=True, on_delete=models.SET_NULL)
     # @property
     def benchmark(self):
         return retail_benchmark_selector(self)
@@ -103,6 +104,13 @@ class Client(models.Model):
     def __str__(self):
         return self.name
 
+class Advisor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    business_group = models.CharField(max_length=100, choices=CLIENT_GROUP_CHOICES)
+    # CLIENT_GROUP_CHOICES will be extracted — see Change 2
+
+    def __str__(self):
+        return f"{self.user.username} ({self.business_group})"
 
 
 # Client Profile information

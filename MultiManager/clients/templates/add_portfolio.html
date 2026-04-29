@@ -1,0 +1,197 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<style>
+    .ap-header {
+        margin: 36px 0 28px;
+    }
+
+    .ap-header .eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: #2ec4b6;
+        margin-bottom: 6px;
+    }
+
+    .ap-header h1 {
+        font-size: 26px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin: 0 0 4px;
+    }
+
+    .ap-header p {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 18px;
+        margin-bottom: 40px;
+    }
+
+    .portfolio-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 22px 24px;
+        box-shadow: 0 2px 14px rgba(0, 0, 0, .06);
+        border: 2px solid transparent;
+        transition: border-color .2s, transform .2s;
+    }
+
+    .portfolio-card:hover {
+        border-color: #2ec4b6;
+        transform: translateY(-2px);
+    }
+
+    .card-group-tag {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 6px;
+    }
+
+    .card-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 12px;
+        line-height: 1.3;
+    }
+
+    .card-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 14px;
+    }
+
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+    }
+
+    .meta-row .meta-label {
+        color: #94a3b8;
+    }
+
+    .meta-row .meta-value {
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .assign-btn {
+        width: 100%;
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
+        padding: 11px;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .2s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .assign-btn:hover {
+        background: #2ec4b6;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid #e2e8f0;
+        color: #475569;
+        padding: 9px 18px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 28px;
+    }
+
+    .btn-outline:hover {
+        border-color: #2ec4b6;
+        color: #1a1a1a;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, .06);
+    }
+
+    .empty-state .icon {
+        font-size: 40px;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 18px;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        font-size: 14px;
+    }
+</style>
+
+<div class="ap-header">
+    <div class="eyebrow">Add Portfolio</div>
+    <h1>{{ client.name }}</h1>
+    <p>Select a portfolio to assign to this client. Their current portfolio will be replaced.</p>
+</div>
+
+<a href="{% url 'client_detail' client.id %}" class="btn-outline">← Back to Client</a>
+
+{% if portfolios %}
+<div class="portfolio-grid">
+    {% for p in portfolios %}
+    <div class="portfolio-card">
+        <div class="card-group-tag">{{ p.client_group }}</div>
+        <div class="card-name">{{ p.name }}</div>
+        <div class="card-meta">
+            <div class="meta-row">
+                <span class="meta-label">Category</span>
+                <span class="meta-value" style="font-size:11px;">{{ p.fund_category }}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Risk Profile</span>
+                <span class="meta-value">{{ p.risk_profile }}</span>
+            </div>
+            {% if p.total_value %}
+            <div class="meta-row">
+                <span class="meta-label">Fund Size</span>
+                <span class="meta-value">R {{ p.total_value|floatformat:0 }}</span>
+            </div>
+            {% endif %}
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="portfolio_id" value="{{ p.id }}">
+            <button type="submit" class="assign-btn">Assign to {{ client.name }}</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">📭</div>
+    <h3>No matching portfolios</h3>
+    <p>No portfolios match {{ client.name }}'s risk tolerance and group. Check the client's profile settings.</p>
+</div>
+{% endif %}
+{% endblock %}

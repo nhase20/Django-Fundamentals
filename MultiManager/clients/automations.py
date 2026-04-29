@@ -296,3 +296,38 @@ def classify_retailer(client):
     if score <= 6:   return "Moderate"
     if score <= 8:   return "Moderate Aggressive"
     return "Aggressive"
+
+RISK_SCORE_MAP = {
+    # Maps total score → risk profile label
+    (0, 3):   'Conservative',
+    (4, 6):   'Cautious',
+    (7, 9):   'Moderate',
+    (10, 12): 'Moderate Aggressive',
+    (13, 15): 'Aggressive',
+}
+
+ASISA_MAP = {
+    'Conservative':        '(ASISA) South African MA Income',
+    'Cautious':            '(ASISA) South African MA Low Equity',
+    'Moderate':            '(ASISA) South African MA Medium Equity',
+    'Moderate Aggressive': '(ASISA) South African MA High Equity',
+    'Aggressive':          '(ASISA) Wwide MA Flexible',
+}
+
+def calculate_risk_profile(answers: dict) -> tuple[str, str]:
+    """
+    answers keys: purpose, time_horizon, emergency_fund, 
+                  volatility_comfort, income_or_growth
+    Returns: (risk_profile_label, asisa_category)
+    """
+    score = 0
+    score += {'retirement': 1, 'education': 2, 'wealth': 3}   .get(answers.get('purpose'), 2)
+    score += {'short': 1, 'medium': 2, 'long': 3}             .get(answers.get('time_horizon'), 2)
+    score += {'no': 0, 'yes': 1}                               .get(answers.get('emergency_fund'), 0)
+    score += {'low': 1, 'medium': 2, 'high': 3}               .get(answers.get('volatility_comfort'), 1)
+    score += {'income': 1, 'balanced': 2, 'growth': 3}        .get(answers.get('income_or_growth'), 2)
+
+    for (lo, hi), label in RISK_SCORE_MAP.items():
+        if lo <= score <= hi:
+            return label, ASISA_MAP[label]
+    return 'Moderate', ASISA_MAP['Moderate']

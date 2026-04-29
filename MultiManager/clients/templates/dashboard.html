@@ -2,185 +2,264 @@
 
 {% block content %}
 
-<!-- HEADER -->
-<div style="margin-bottom:24px;">
-    <h1>Welcome, {{ client.name|default:"Client" }}</h1>
-    <p style="color:#555; margin:0;">
-        {{ client.risk_profile|default:"-" }} ·
-        {{ client.time_horizon|default:"-" }}-year horizon ·
-        {{ client.client_group|default:"-" }}
-    </p>
+<style>
+    .adv-header {
+        margin: 36px 0 28px;
+    }
+
+    .adv-header .eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: #2ec4b6;
+        margin-bottom: 6px;
+    }
+
+    .adv-header h1 {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin: 0 0 4px;
+    }
+
+    .adv-header p {
+        color: #64748b;
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .stat-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px 24px;
+        flex: 1;
+        min-width: 140px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+    }
+
+    .stat-card h4 {
+        font-size: 12px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin: 0 0 8px;
+    }
+
+    .stat-card h2 {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .section-header h3 {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .btn-teal {
+        background: #2ec4b6;
+        color: #fff;
+        padding: 10px 22px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        display: inline-block;
+        transition: background .2s, transform .15s;
+    }
+
+    .btn-teal:hover {
+        background: #1a1a1a;
+        transform: translateY(-1px);
+    }
+
+    .client-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, .06);
+    }
+
+    .client-table thead tr {
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .client-table th {
+        padding: 14px 18px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #94a3b8;
+        text-align: left;
+    }
+
+    .client-table td {
+        padding: 14px 18px;
+        font-size: 14px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .client-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .client-table tr:hover td {
+        background: #f8fafc;
+    }
+
+    .profile-pill {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 700;
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .profile-pill.aggressive {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .profile-pill.moderate {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .profile-pill.conservative {
+        background: #f0fdf4;
+        color: #166534;
+    }
+
+    .profile-pill.cautious {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, .06);
+    }
+
+    .empty-state .icon {
+        font-size: 40px;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 18px;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+</style>
+
+<div class="adv-header">
+    <div class="eyebrow">Advisor Dashboard</div>
+    <h1>Welcome, {{ advisor.user.first_name|default:advisor.user.username }}</h1>
+    <p>{{ advisor.business_group }} · {{ clients|length }} client{{ clients|length|pluralize }}</p>
 </div>
 
-<!-- METRIC CARDS -->
-<div class="card-row">
-    <div class="card">
-        <h4>Risk Profile</h4>
-        <h2>{{ client.risk_profile|default:"-" }}</h2>
+<!-- Stats -->
+<div class="stat-row">
+    <div class="stat-card">
+        <h4>Total Clients</h4>
+        <h2>{{ clients|length }}</h2>
     </div>
-    <div class="card">
-        <h4>Fund Category</h4>
-        <h2 style="font-size:0.9rem;">{{ client.risk_tolerance|default:"-" }}</h2>
+    <div class="stat-card">
+        <h4>Business Group</h4>
+        <h2 style="font-size:16px; padding-top:6px;">{{ advisor.business_group }}</h2>
     </div>
-    <div class="card">
-        <h4>Risk Rating</h4>
-        <h2>{{ client.risk_rating|capfirst|default:"-" }}</h2>
-    </div>
-    <div class="card">
-        <h4>Matched Portfolios</h4>
-        <h2>{{ recommended_portfolios|length }}</h2>
+    <div class="stat-card">
+        <h4>Username</h4>
+        <h2 style="font-size:16px; padding-top:6px;">{{ advisor.user.username }}</h2>
     </div>
 </div>
 
-<!-- MAIN GRID -->
-<div class="card-row" style="margin-top:24px; align-items:flex-start;">
-
-    <!-- LEFT -->
-    <div style="flex:2; display:flex; flex-direction:column; gap:20px;">
-
-        <!-- ALLOCATION -->
-        <div class="card">
-            <h3>Your Asset Allocation</h3>
-            <p style="color:#555; font-size:0.85rem;">
-                Based on your {{ client.risk_profile|default:"-" }} profile,
-                {{ client.time_horizon|default:"-" }}-year horizon,
-                and {{ client.risk_rating|default:"-" }} risk rating.
-            </p>
-
-            <div style="display:flex; gap:24px; flex-wrap:wrap;">
-                <canvas id="allocationChart" width="220" height="220"></canvas>
-
-                <div style="flex:1;">
-                    {% if allocation %}
-                    {% for label, pct in allocation.items %}
-                    <div style="margin-bottom:10px;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <span>{{ label }}</span>
-                            <strong>{{ pct }}%</strong>
-                        </div>
-                        <div style="background:#eee; height:6px; border-radius:4px;">
-                            <!-- <div style="width:{{ pct|default:0|floatformat:0 }}%; height:6px; background:#4f46e5;"></div> -->
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <p style="color:#999;">No allocation data available.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- INSIGHTS -->
-        <div class="card">
-            <h3>Portfolio Suitability</h3>
-            <p><strong>{{ insights.suitability|default:"-" }}</strong></p>
-            <p style="color:#444;">{{ insights.reasoning|default:"-" }}</p>
-            <p style="font-size:0.85rem;">
-                Suggested benchmark: <strong>{{ insights.benchmark|default:"-" }}</strong>
-            </p>
-        </div>
-
-        <!-- SCENARIOS -->
-        <div class="card">
-            <h3>Risk / Return Scenarios</h3>
-
-            {% if insights.scenarios %}
-            {% for scenario in insights.scenarios %}
-            <!-- <div style="border-left:4px solid {{ scenario.colour|default:'#4f46e5' }};
-                            padding:10px; margin-bottom:10px; background:#f5f5f5;"> -->
-                <strong>{{ scenario.label|default:"Scenario" }}</strong><br>
-                <small>{{ scenario.return_range|default:"-" }} · {{ scenario.probability|default:"-" }}</small>
-                <p style="margin:4px 0 0;">{{ scenario.description|default:"-" }}</p>
-            </div>
-            {% endfor %}
-            {% else %}
-            <p style="color:#999;">No scenario data available.</p>
-            {% endif %}
-        </div>
-
-    </div>
-
-    <!-- RIGHT -->
-    <div style="flex:1; display:flex; flex-direction:column; gap:20px;">
-
-        <!-- PORTFOLIOS -->
-        <div class="card">
-            <h3>Recommended Portfolios</h3>
-            {% if recommended_portfolios %}
-            <ul>
-                {% for p in recommended_portfolios %}
-                <li>
-                    <strong>{{ p.name }}</strong><br>
-                    <small>{{ p.risk_profile }} · {{ p.fund_category }}</small>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p style="color:#999;">No matching portfolio found.</p>
-            {% endif %}
-        </div>
-
-        <!-- RISK INTERPRETATION -->
-        <div class="card">
-            <h3>Risk Interpretation</h3>
-            <p>
-                A <strong>{{ client.risk_profile|default:"-" }}</strong> client with a
-                <strong>{{ client.time_horizon|default:"-" }}-year</strong> horizon
-                {% if client.risk_profile == "Aggressive" or client.risk_profile == "Moderate Aggressive" %}
-                prioritises growth and accepts volatility.
-                {% elif client.risk_profile == "Conservative" or client.risk_profile == "Cautious" %}
-                prioritises stability and income.
-                {% else %}
-                balances growth and preservation.
-                {% endif %}
-            </p>
-        </div>
-
-        <!-- ACTIONS -->
-        <div class="card">
-            <h3>Advisor Actions</h3>
-            <button class="btn">Approve Portfolio</button>
-            <button class="btn btn-outline">Override</button>
-            <button class="btn btn-outline">Add portfolio</button>
-        </div>
-
-    </div>
+<!-- Client list -->
+<div class="section-header">
+    <h3>Your Clients</h3>
+    <a href="{% url 'create_client' %}" class="btn-teal">+ Add New Client</a>
 </div>
 
-<!-- CHART -->
-<script>
-    (function () {
-        const canvas = document.getElementById('allocationChart');
-        if (!canvas) return;
-
-        let allocation = {};
-        try {
-            allocation = JSON.parse('{{ allocation_json|escapejs }}');
-        } catch {
-            allocation = {};
-        }
-
-        const labels = Object.keys(allocation);
-        const values = Object.values(allocation);
-
-        if (!labels.length || !values.length) return;
-
-        new Chart(canvas, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: ['#4f46e5', '#0ea5e9', '#f59e0b', '#10b981']
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false } },
-                cutout: '60%',
-                responsive: true
-            }
-        });
-    })();
-</script>
+{% if clients %}
+<table class="client-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Risk Profile</th>
+            <th>ASISA Category</th>
+            <th>Horizon</th>
+            <th>Goal</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in clients %}
+        <tr style="cursor:pointer;" onclick="this.querySelector('a').click();">
+            <td><strong>{{ c.name }}</strong></td>
+            <td>{{ c.age }}</td>
+            <td>
+                <span class="profile-pill
+            {% if 'Aggressive' in c.risk_profile %}aggressive
+            {% elif 'Conservative' in c.risk_profile %}conservative
+            {% elif 'Cautious' in c.risk_profile %}cautious
+            {% elif 'Moderate' in c.risk_profile %}moderate
+            {% endif %}">
+                    {{ c.risk_profile|default:"—" }}
+                </span>
+            </td>
+            <td style="font-size:12px;">{{ c.risk_tolerance|default:"—" }}</td>
+            <td>{{ c.time_horizon }}y</td>
+            <td>{{ c.investment_goal|default:"—" }}</td>
+            <td onclick="event.stopPropagation()">
+                <a href="{% url 'client_detail' c.id %}" class="btn-teal" style="padding:6px 14px;font-size:12px;">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <div class="icon">👥</div>
+    <h3>No clients yet</h3>
+    <p>Start by adding your first client. Their group will be set automatically to <strong>{{ advisor.business_group
+            }}</strong>.</p>
+    <a href="{% url 'create_client' %}" class="btn-teal">+ Add First Client</a>
+</div>
+{% endif %}
 
 {% endblock %}
