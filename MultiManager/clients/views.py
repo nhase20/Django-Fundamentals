@@ -178,8 +178,10 @@ def client_detail(request, client_id):
 
     group_portfolios = Portfolio.objects.filter(
         client_group__iexact=client.client_group,
-        fund_category__icontains=client.risk_tolerance,
+        risk_profile__iexact=client.risk_profile,
+        fund_category__iexact=client.risk_tolerance,
     )
+
     if group_portfolios.exists():
         recommended = group_portfolios
         source = 'group'
@@ -192,6 +194,7 @@ def client_detail(request, client_id):
         ]
         recommended = Portfolio.objects.filter(
             client_group__in=graviton_groups,
+            risk_profile__iexact=client.risk_profile,
             fund_category__iexact=client.risk_tolerance,
         )
         source = 'graviton'

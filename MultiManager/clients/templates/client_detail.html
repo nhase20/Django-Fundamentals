@@ -54,6 +54,21 @@
         cursor: pointer;
     }
 
+    button.btn-teal {
+    background: #2ec4b6 !important;
+    color: #fff !important;
+    padding: 5px 14px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+    line-height: 1.2 !important;
+    height: auto !important;
+    min-height: unset !important;
+
+    /* critical: disable browser / framework styling */
+    appearance: none;
+    -webkit-appearance: none;
+    }
+    
     .btn-teal:hover {
         background: #1a1a1a;
         transform: translateY(-1px);
@@ -540,7 +555,7 @@
                     <form method="POST" action="{% url 'add_portfolio' client.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="portfolio_id" value="{{ p.id }}">
-                        <button type="submit" class="btn-teal" style="padding:5px 14px;font-size:12px;">Assign</button>
+                        <button type="submit" class="btn-teal">Assign</button>
                     </form>
                 </td>
             </tr>
