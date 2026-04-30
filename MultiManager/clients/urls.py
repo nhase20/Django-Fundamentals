@@ -15,4 +15,5 @@ urlpatterns = [
     path('client/<int:client_id>/edit/',      views.edit_client,       name='edit_client'),
     path('client/<int:client_id>/portfolio/', views.add_portfolio,     name='add_portfolio'),
     path('results/<int:client_id>/',      views.portfolio_results, name='portfolio_results'),
+    path('advisor/portfolios/', views.portfolio_list, name='portfolio_list'),
 ]

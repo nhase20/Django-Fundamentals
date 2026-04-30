@@ -111,16 +111,6 @@ def create_client(request):
                 risk_rating='medium',
             )
 
-            username = request.POST.get('username', '').strip()
-            password = request.POST.get('password', '').strip()
-
-            if User.objects.filter(username=username).exists():
-                return render(request, 'questionnaire.html', {
-                    'form': form,
-                    'error': 'That username is already taken.',
-                    'advisor': advisor,
-                })
-
             return redirect('portfolio_results', client_id=client.id)
     else:
         form = ClientQuestionnaireForm()
@@ -256,10 +246,13 @@ def add_portfolio(request, client_id):
                 portfolio.save()
             except Portfolio.DoesNotExist:
                 pass
+        print('Das Goodt')
         return redirect('client_detail', client_id=client.id)
-
+    
+    print('Passed stage')
     group_portfolios = Portfolio.objects.filter(
         client_group__iexact=client.client_group,
+        risk_profile__iexact=client.risk_profile,
         fund_category__iexact=client.risk_tolerance,
     )
     if not group_portfolios.exists():
@@ -270,7 +263,9 @@ def add_portfolio(request, client_id):
             'Graviton Wealth (Franchises)','Graviton Wealth Management',
         ]
         group_portfolios = Portfolio.objects.filter(
-            client_group__in=graviton_groups, fund_category__iexact=client.risk_tolerance,
+            client_group__in=graviton_groups,
+            risk_profile__iexact=client.risk_profile,
+            fund_category__iexact=client.risk_tolerance,
         )
 
     return render(request, 'add_portfolio.html', {
@@ -305,7 +300,7 @@ def dashboard(request):
 # ── Portfolio results ───────────────────────────────────────────────────────────
 @login_required
 def portfolio_results(request, client_id):
-    client = Client.objects.get(id=client_id)
+    client = Client.objects.get_object_or_404(id=client_id)
 
     group_portfolios = Portfolio.objects.filter(
         client_group__iexact=client.client_group,
@@ -382,6 +377,49 @@ def admin_overview(request):
         'age_counts':     json.dumps([b['count'] for b in age_buckets]),
     }
     return render(request, 'admin_overview.html', context)
+
+@login_required
+def portfolio_list(request):
+    if not hasattr(request.user, 'advisor'):
+        return redirect('dashboard')
+
+    advisor = request.user.advisor
+
+    GRAVITON_GROUPS = [
+    'Graviton', 'Graviton Wealth', 'Graviton Absolute Funds',
+    'Graviton Global Funds', 'Graviton Hedge Funds', 'Graviton Hybrid Funds',
+    'Graviton Offshore (Franchises)', 'Graviton Retirement Solution',
+    'Graviton Shariah Funds', 'Graviton Wealth (Franchises)',
+    'Graviton Wealth Management',
+    ]
+
+    group_portfolios = Portfolio.objects.filter(
+    client_group__iexact=advisor.business_group,
+    ).order_by('risk_profile', 'name')
+
+    # Show Graviton fallbacks only when the advisor's own group is not a Graviton group,
+    # OR always as a supplementary reference section when they are Graviton.
+    graviton_portfolios = Portfolio.objects.filter(
+    client_group__in=GRAVITON_GROUPS,
+    ).exclude(
+    client_group__iexact=advisor.business_group,
+    ).order_by('client_group', 'risk_profile', 'name')
+
+    # Unique risk profiles for the filter dropdown
+    all_profiles = sorted(set(
+    list(group_portfolios.values_list('risk_profile', flat=True)) +
+    list(graviton_portfolios.values_list('risk_profile', flat=True))
+    ))
+
+    source = 'group' if group_portfolios.exists() else 'graviton'
+
+    return render(request, 'portfolio_list.html', {
+    'advisor': advisor,
+    'group_portfolios': group_portfolios,
+    'graviton_portfolios': graviton_portfolios,
+    'risk_profiles': all_profiles,
+    'source': source,
+    })
 
 
 def about(request):

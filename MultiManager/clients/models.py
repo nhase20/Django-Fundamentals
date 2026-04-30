@@ -66,12 +66,12 @@ class Client(models.Model):
         ('(ASISA) South African MA Low Equity', '(ASISA) South African MA Low Equity'),
         ('(ASISA) South African MA Medium Equity', '(ASISA) South African MA Medium Equity'),
         ('(ASISA) South African MA High Equity', '(ASISA) South African MA High Equity'),
-        ('(ASISA) Wwide MA Flexible', '(ASISA) Wwide MA Flexible'),  # note: CSV spells it "Wwide"
+        ('(ASISA) Wwide MA Flexible', '(ASISA) Wwide MA Flexible'), 
         ('EAA Fund USD Cautious Allocation', 'EAA Fund USD Cautious Allocation'),
         ('EAA Fund USD Moderate Allocation', 'EAA Fund USD Moderate Allocation'),
         ('EAA Fund USD Aggressive Allocation', 'EAA Fund USD Aggressive Allocation'),
         ('EAA Fund USD Diversified Bond - Short Term', 'EAA Fund USD Diversified Bond - Short Term'),
-        ('SA Equity', 'SA Equity'),  # CSV has a trailing space — strip it in import_portfolios
+        ('SA Equity', 'SA Equity'),  # CSV has a trailing space 
     ]
 
     RISK_RATING = [
