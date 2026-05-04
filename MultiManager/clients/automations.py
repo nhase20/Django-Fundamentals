@@ -104,14 +104,8 @@ def dynamic_asset_allocation(client):
 # ─────────────────────────────────────────────
 
 def generate_client_insights(client):
-    """
-    Builds a full narrative insight block for a client.
-    Returns:
-        suitability  — one-sentence verdict
-        reasoning    — paragraph explaining the why
-        benchmark    — suggested index benchmark
-        scenarios    — list of 5 dicts (label, probability, return_range, description)
-    """
+    # Builds a full narrative insight block for a client.
+
 
     risk    = client.risk_profile
     horizon = client.time_horizon or 5
@@ -268,11 +262,42 @@ def generate_client_insights(client):
         },
     ]
 
+    # Default scenario
+    scenario = next(s for s in scenarios if s["label"] == "Base Case")
+
+    # Defensive profiles + short runway → downside matters most
+    if horizon <= 5 or rating in ("low", "low-medium"):
+        scenario = next(
+            s for s in scenarios
+            if s["label"] == "Mild Bear / Underperformance"
+        )
+
+    # Very short horizon or capital-sensitive → worst case
+    elif horizon <= 3 or age >= 60:
+        scenario = next(
+            s for s in scenarios
+            if s["label"] == "Severe Bear Market"
+        )
+
+    # Long horizon + high risk tolerance → upside scenarios relevant
+    elif horizon >= 12 and rating in ("high", "pure equity"):
+        scenario = next(
+            s for s in scenarios
+            if s["label"] == "Bull Market Upside"
+        )
+
+    # Very long horizon + aggressive → tail upside
+    elif horizon >= 20 and rating in ("high", "pure equity"):
+        scenario = next(
+            s for s in scenarios
+            if s["label"] == "Exceptional Bull Run"
+        )
+
     return {
         "suitability": suitability,
         "reasoning":   reasoning,
         "benchmark":   benchmark,
-        "scenarios":   scenarios,
+        "scenario":   scenario,
     }
 
 

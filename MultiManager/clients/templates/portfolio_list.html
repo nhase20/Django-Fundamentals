@@ -33,7 +33,28 @@
         margin: 0;
     }
 
-    /* Search + filter bar */
+    .btn-teal {
+        background: #2ec4b6;
+        color: #fff;
+        padding: 10px 22px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: none;
+        cursor: pointer;
+        transition: background .2s, transform .15s;
+        white-space: nowrap;
+    }
+
+    .btn-teal:hover {
+        background: #1a1a1a;
+        transform: translateY(-1px);
+    }
+
     .filter-bar {
         display: flex;
         gap: 10px;
@@ -84,7 +105,6 @@
         white-space: nowrap;
     }
 
-    /* Section headers */
     .section-block {
         margin-bottom: 36px;
     }
@@ -111,17 +131,21 @@
         letter-spacing: .04em;
     }
 
+    .pill-custom {
+        background: #2ec4b6;
+        color: #fff;
+    }
+
     .pill-group {
         background: #1a1a1a;
         color: #2ec4b6;
     }
 
     .pill-graviton {
-        background: #2ec4b6;
-        color: #fff;
+        background: #e0e7ff;
+        color: #3730a3;
     }
 
-    /* Table */
     .pl-table-wrap {
         background: #fff;
         border-radius: 14px;
@@ -190,7 +214,6 @@
         white-space: nowrap;
     }
 
-    /* Risk profile badges */
     .rp-badge {
         display: inline-block;
         font-size: 11px;
@@ -235,14 +258,12 @@
         color: #475569;
     }
 
-    /* ASISA category */
     .asisa-text {
         color: #475569;
         font-size: 12px;
         max-width: 260px;
     }
 
-    /* Value */
     .value-text {
         font-weight: 600;
         color: #1a1a1a;
@@ -253,7 +274,16 @@
         color: #94a3b8;
     }
 
-    /* Empty state */
+    .custom-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #2ec4b6;
+        margin-right: 6px;
+        vertical-align: middle;
+    }
+
     .empty-state {
         padding: 40px 24px;
         text-align: center;
@@ -261,7 +291,6 @@
         font-size: 14px;
     }
 
-    /* No results message */
     #no-results {
         display: none;
         padding: 32px;
@@ -272,58 +301,119 @@
         border-radius: 14px;
         box-shadow: 0 2px 14px rgba(0, 0, 0, .06);
     }
+
+    .success-banner {
+        background: #d1fae5;
+        color: #065f46;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 </style>
+
+{% if messages %}
+{% for message in messages %}
+<div class="success-banner">✓ {{ message }}</div>
+{% endfor %}
+{% endif %}
 
 <div class="pl-header">
     <div class="pl-header-left">
         <div class="eyebrow">Advisor Portal</div>
         <h1>Portfolio List</h1>
-        <p>
-            {% if source == 'group' %}
-            Portfolios for <strong>{{ advisor.business_group }}</strong> and Graviton fallbacks
-            {% else %}
-            Graviton fallback portfolios (no group-specific portfolios found)
-            {% endif %}
+        <p>Portfolios for <strong>{{ advisor.business_group }}</strong>
+            {% if custom_portfolios %} · <strong>{{ custom_portfolios|length }}</strong> created by you{% endif %}
         </p>
     </div>
+    <a href="{% url 'create_portfolio' %}" class="btn-teal">
+        <span style="font-size:18px;line-height:1;">+</span> Create Portfolio
+    </a>
 </div>
 
-<!-- Filter bar -->
 <div class="filter-bar">
     <input type="text" id="search-input" placeholder="Search by name, risk profile or ASISA category…"
         oninput="filterTable()">
     <select id="profile-filter" onchange="filterTable()">
         <option value="">All risk profiles</option>
-        {% for rp in risk_profiles %}
-        <option value="{{ rp }}">{{ rp }}</option>
-        {% endfor %}
+        {% for rp in risk_profiles %}<option value="{{ rp|lower }}">{{ rp }}</option>{% endfor %}
     </select>
     <select id="section-filter" onchange="filterTable()">
         <option value="">All sources</option>
-        <option value="group">{{ advisor.business_group }}</option>
-        <option value="graviton">Graviton</option>
+        {% if custom_portfolios %}<option value="custom">Created by me</option>{% endif %}
+        {% if group_portfolios %}<option value="group">{{ advisor.business_group }}</option>{% endif %}
+        {% if graviton_portfolios %}<option value="graviton">Graviton</option>{% endif %}
     </select>
     <span class="result-count" id="result-count"></span>
 </div>
 
 <div id="no-results">No portfolios match your filters.</div>
 
-<!-- GROUP-SPECIFIC PORTFOLIOS -->
-{% if group_portfolios %}
-<div class="section-block" id="section-group" data-section="group">
+{% if custom_portfolios %}
+<div class="section-block" data-section="custom">
     <div class="section-label">
-        <h2>{{ advisor.business_group }}</h2>
-        <span class="section-pill pill-group">Your Group</span>
+        <h2>Created by You</h2>
+        <span class="section-pill pill-custom">Your Portfolios</span>
     </div>
     <div class="pl-table-wrap">
-        <table class="pl-table" id="table-group">
+        <table class="pl-table">
             <thead>
                 <tr>
                     <th>Portfolio Name</th>
                     <th>Risk Profile</th>
                     <th>ASISA Category</th>
                     <th>Total Value</th>
-                    <th>Client Group</th>
+                    <th>Company</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in custom_portfolios %}
+                <tr data-name="{{ p.name|lower }}" data-profile="{{ p.risk_profile|lower }}"
+                    data-asisa="{{ p.fund_category|lower }}" data-section="custom">
+                    <td class="portfolio-name"><span class="custom-dot"></span>{{ p.name }}</td>
+                    <td>
+                        <span class="rp-badge
+                                                {% if 'Aggressive' in p.risk_profile and 'Moderate' not in p.risk_profile %}rp-aggressive
+                                                {% elif 'Moderate Aggressive' in p.risk_profile %}rp-mod-aggressive
+                                                {% elif p.risk_profile == 'Moderate' or p.risk_profile == 'Global Moderate' %}rp-moderate
+                                                {% elif 'Conservative' in p.risk_profile %}rp-conservative
+                                                {% elif 'Cautious' in p.risk_profile %}rp-cautious
+                                                {% elif 'Global' in p.risk_profile %}rp-global
+                                                {% else %}rp-default{% endif %}">
+                            {{ p.risk_profile }}
+                        </span>
+                    </td>
+                    <td class="asisa-text">{{ p.fund_category }}</td>
+                    <td class="{% if p.total_value %}value-text{% else %}value-zero{% endif %}">{% if p.total_value %}R
+                        {{ p.total_value|floatformat:2 }}{% else %}—{% endif %}</td>
+                    <td><span class="group-tag">{{ p.client_group }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if group_portfolios %}
+<div class="section-block" data-section="group">
+    <div class="section-label">
+        <h2>{{ advisor.business_group }}</h2>
+        <span class="section-pill pill-group">Your Group</span>
+    </div>
+    <div class="pl-table-wrap">
+        <table class="pl-table">
+            <thead>
+                <tr>
+                    <th>Portfolio Name</th>
+                    <th>Risk Profile</th>
+                    <th>ASISA Category</th>
+                    <th>Total Value</th>
+                    <th>Company</th>
                 </tr>
             </thead>
             <tbody>
@@ -333,29 +423,20 @@
                     <td class="portfolio-name">{{ p.name }}</td>
                     <td>
                         <span class="rp-badge
-                            {% if 'Aggressive' in p.risk_profile and 'Moderate' not in p.risk_profile %}rp-aggressive
-                            {% elif 'Moderate Aggressive' in p.risk_profile %}rp-mod-aggressive
-                            {% elif p.risk_profile == 'Moderate' or p.risk_profile == 'Global Moderate' %}rp-moderate
-                            {% elif 'Conservative' in p.risk_profile %}rp-conservative
-                            {% elif 'Cautious' in p.risk_profile %}rp-cautious
-                            {% elif 'Global' in p.risk_profile %}rp-global
-                            {% else %}rp-default{% endif %}">
+                                                {% if 'Aggressive' in p.risk_profile and 'Moderate' not in p.risk_profile %}rp-aggressive
+                                                {% elif 'Moderate Aggressive' in p.risk_profile %}rp-mod-aggressive
+                                                {% elif p.risk_profile == 'Moderate' or p.risk_profile == 'Global Moderate' %}rp-moderate
+                                                {% elif 'Conservative' in p.risk_profile %}rp-conservative
+                                                {% elif 'Cautious' in p.risk_profile %}rp-cautious
+                                                {% elif 'Global' in p.risk_profile %}rp-global
+                                                {% else %}rp-default{% endif %}">
                             {{ p.risk_profile }}
                         </span>
                     </td>
                     <td class="asisa-text">{{ p.fund_category }}</td>
-                    <td class="{% if p.total_value %}value-text{% else %}value-zero{% endif %}">
-                        {% if p.total_value %}
-                        R {{ p.total_value|floatformat:2 }}
-                        {% else %}
-                        —
-                        {% endif %}
-                    </td>
+                    <td class="{% if p.total_value %}value-text{% else %}value-zero{% endif %}">{% if p.total_value %}R
+                        {{ p.total_value|floatformat:2 }}{% else %}—{% endif %}</td>
                     <td><span class="group-tag">{{ p.client_group }}</span></td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="empty-state">No portfolios found for this group.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -364,22 +445,21 @@
 </div>
 {% endif %}
 
-<!-- GRAVITON FALLBACK PORTFOLIOS -->
 {% if graviton_portfolios %}
-<div class="section-block" id="section-graviton" data-section="graviton">
+<div class="section-block" data-section="graviton">
     <div class="section-label">
         <h2>Graviton Fallbacks</h2>
-        <span class="section-pill pill-graviton">Graviton</span>
+        <span class="section-pill pill-graviton">Reference</span>
     </div>
     <div class="pl-table-wrap">
-        <table class="pl-table" id="table-graviton">
+        <table class="pl-table">
             <thead>
                 <tr>
                     <th>Portfolio Name</th>
                     <th>Risk Profile</th>
                     <th>ASISA Category</th>
                     <th>Total Value</th>
-                    <th>Client Group</th>
+                    <th>Company</th>
                 </tr>
             </thead>
             <tbody>
@@ -389,29 +469,20 @@
                     <td class="portfolio-name">{{ p.name }}</td>
                     <td>
                         <span class="rp-badge
-                            {% if 'Aggressive' in p.risk_profile and 'Moderate' not in p.risk_profile %}rp-aggressive
-                            {% elif 'Moderate Aggressive' in p.risk_profile %}rp-mod-aggressive
-                            {% elif p.risk_profile == 'Moderate' or p.risk_profile == 'Global Moderate' %}rp-moderate
-                            {% elif 'Conservative' in p.risk_profile %}rp-conservative
-                            {% elif 'Cautious' in p.risk_profile %}rp-cautious
-                            {% elif 'Global' in p.risk_profile %}rp-global
-                            {% else %}rp-default{% endif %}">
+                                                {% if 'Aggressive' in p.risk_profile and 'Moderate' not in p.risk_profile %}rp-aggressive
+                                                {% elif 'Moderate Aggressive' in p.risk_profile %}rp-mod-aggressive
+                                                {% elif p.risk_profile == 'Moderate' or p.risk_profile == 'Global Moderate' %}rp-moderate
+                                                {% elif 'Conservative' in p.risk_profile %}rp-conservative
+                                                {% elif 'Cautious' in p.risk_profile %}rp-cautious
+                                                {% elif 'Global' in p.risk_profile %}rp-global
+                                                {% else %}rp-default{% endif %}">
                             {{ p.risk_profile }}
                         </span>
                     </td>
                     <td class="asisa-text">{{ p.fund_category }}</td>
-                    <td class="{% if p.total_value %}value-text{% else %}value-zero{% endif %}">
-                        {% if p.total_value %}
-                        R {{ p.total_value|floatformat:2 }}
-                        {% else %}
-                        —
-                        {% endif %}
-                    </td>
+                    <td class="{% if p.total_value %}value-text{% else %}value-zero{% endif %}">{% if p.total_value %}R
+                        {{ p.total_value|floatformat:2 }}{% else %}—{% endif %}</td>
                     <td><span class="group-tag">{{ p.client_group }}</span></td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="empty-state">No Graviton portfolios found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -420,12 +491,13 @@
 </div>
 {% endif %}
 
-{% if not group_portfolios and not graviton_portfolios %}
+{% if not custom_portfolios and not group_portfolios and not graviton_portfolios %}
 <div class="empty-state"
-    style="background:#fff; border-radius:14px; padding:60px 24px; box-shadow:0 2px 14px rgba(0,0,0,.06);">
-    <p style="font-size:32px; margin:0 0 12px;">📂</p>
-    <p style="font-size:16px; font-weight:600; color:#1a1a1a; margin:0 0 6px;">No portfolios found</p>
-    <p style="margin:0;">No portfolios exist for <strong>{{ advisor.business_group }}</strong> or Graviton yet.</p>
+    style="background:#fff;border-radius:14px;padding:60px 24px;box-shadow:0 2px 14px rgba(0,0,0,.06);">
+    <p style="font-size:32px;margin:0 0 12px;">📂</p>
+    <p style="font-size:16px;font-weight:600;color:#1a1a1a;margin:0 0 6px;">No portfolios yet</p>
+    <p style="margin:0 0 20px;">Create your first portfolio or ask your admin to import data.</p>
+    <a href="{% url 'create_portfolio' %}" class="btn-teal">+ Create Portfolio</a>
 </div>
 {% endif %}
 
@@ -434,42 +506,23 @@
         const search = document.getElementById('search-input').value.toLowerCase().trim();
         const profile = document.getElementById('profile-filter').value.toLowerCase();
         const section = document.getElementById('section-filter').value;
-
         const rows = document.querySelectorAll('.pl-table tbody tr[data-name]');
         let visible = 0;
-
         rows.forEach(row => {
-            const name = row.dataset.name || '';
-            const prof = row.dataset.profile || '';
-            const asisa = row.dataset.asisa || '';
-            const sec = row.dataset.section || '';
-
-            const matchSearch = !search || name.includes(search) || prof.includes(search) || asisa.includes(search);
-            const matchProfile = !profile || prof.includes(profile);
-            const matchSection = !section || sec === section;
-
-            const show = matchSearch && matchProfile && matchSection;
-            row.classList.toggle('hidden-row', !show);
-            if (show) visible++;
+            const ok = (!search || row.dataset.name.includes(search) || row.dataset.profile.includes(search) || row.dataset.asisa.includes(search))
+                && (!profile || row.dataset.profile.includes(profile))
+                && (!section || row.dataset.section === section);
+            row.classList.toggle('hidden-row', !ok);
+            if (ok) visible++;
         });
-
-        // Hide section blocks entirely if all their rows are hidden
-        document.querySelectorAll('.section-block').forEach(block => {
-            const secVal = block.dataset.section;
-            const sectionMatch = !section || section === secVal;
-            const hasVisible = block.querySelectorAll('tr[data-name]:not(.hidden-row)').length > 0;
-            block.style.display = (sectionMatch && hasVisible) ? '' : 'none';
+        document.querySelectorAll('.section-block').forEach(b => {
+            const secOk = !section || section === b.dataset.section;
+            const hasVis = b.querySelectorAll('tr[data-name]:not(.hidden-row)').length > 0;
+            b.style.display = (secOk && hasVis) ? '' : 'none';
         });
-
-        const noResults = document.getElementById('no-results');
-        noResults.style.display = visible === 0 ? 'block' : 'none';
-
-        const countEl = document.getElementById('result-count');
-        countEl.textContent = visible + ' portfolio' + (visible !== 1 ? 's' : '');
+        document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
+        document.getElementById('result-count').textContent = visible + ' portfolio' + (visible !== 1 ? 's' : '');
     }
-
-    // Run on load to set the count
     document.addEventListener('DOMContentLoaded', filterTable);
 </script>
-
 {% endblock %}

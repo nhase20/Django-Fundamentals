@@ -1,4 +1,4 @@
-# clients/views.py
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -6,7 +6,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Count
 from .forms import ClientQuestionnaireForm
-from .models import Portfolio, AssetManaged, Profile, Client, Advisor, CLIENT_GROUP_CHOICES
+from .models import Portfolio, Client, Advisor, CLIENT_GROUP_CHOICES
 from .automations import dynamic_asset_allocation, generate_client_insights, calculate_risk_profile
 import json
 
@@ -20,7 +20,7 @@ def home(request):
         if user is not None:
             login(request, user)
             if hasattr(user, 'advisor'):
-                return redirect('create_client')
+                return redirect('admin_overview')
             elif user.is_staff:
                 return redirect('admin_overview')
             else:
@@ -162,7 +162,13 @@ def client_detail(request, client_id):
         "value": raw_insights["benchmark"],
         "explanation": "Reference index used to evaluate performance."
     },
+    {
+        "label": raw_insights["scenario"]['label'],
+        "value": "Probability "+ raw_insights["scenario"]["probability"],
+        "explanation": raw_insights["scenario"]["description"] +" -- {"+raw_insights["scenario"]["return_range"]+"}"
+    },
 ]
+    # print("Scenario: ",raw_insights["scenario"])
 
     assigned_portfolios = Portfolio.objects.filter(client=client)
 
@@ -300,10 +306,11 @@ def dashboard(request):
 # ── Portfolio results ───────────────────────────────────────────────────────────
 @login_required
 def portfolio_results(request, client_id):
-    client = Client.objects.get_object_or_404(id=client_id)
+    client = get_object_or_404(id=client_id)
 
     group_portfolios = Portfolio.objects.filter(
         client_group__iexact=client.client_group,
+        risk_profile__iexact=client.risk_profile,
         fund_category__iexact=client.risk_tolerance,
     )
 
@@ -320,6 +327,7 @@ def portfolio_results(request, client_id):
         ]
         recommended = Portfolio.objects.filter(
             client_group__in=graviton_groups,
+            risk_profile__iexact=client.risk_profile,
             fund_category__iexact=client.risk_tolerance,
         )
         source = 'graviton'
@@ -378,20 +386,20 @@ def admin_overview(request):
     }
     return render(request, 'admin_overview.html', context)
 
+GRAVITON_GROUPS = [
+    'Graviton', 'Graviton Wealth', 'Graviton Absolute Funds',
+    'Graviton Global Funds', 'Graviton Hedge Funds', 'Graviton Hybrid Funds',
+    'Graviton Offshore (Franchises)', 'Graviton Retirement Solution',
+    'Graviton Shariah Funds', 'Graviton Wealth (Franchises)',
+    'Graviton Wealth Management',
+]
+
 @login_required
 def portfolio_list(request):
     if not hasattr(request.user, 'advisor'):
         return redirect('dashboard')
 
     advisor = request.user.advisor
-
-    GRAVITON_GROUPS = [
-    'Graviton', 'Graviton Wealth', 'Graviton Absolute Funds',
-    'Graviton Global Funds', 'Graviton Hedge Funds', 'Graviton Hybrid Funds',
-    'Graviton Offshore (Franchises)', 'Graviton Retirement Solution',
-    'Graviton Shariah Funds', 'Graviton Wealth (Franchises)',
-    'Graviton Wealth Management',
-    ]
 
     group_portfolios = Portfolio.objects.filter(
     client_group__iexact=advisor.business_group,
@@ -421,6 +429,83 @@ def portfolio_list(request):
     'source': source,
     })
 
+
+@login_required
+def create_portfolio(request):
+
+    if not hasattr(request.user, 'advisor'):
+        return redirect('dashboard')
+
+    advisor = request.user.advisor
+
+    # Choices pulled from the existing model constants
+    risk_profile_choices = Client.RISK_PROFILE   # e.g. [('Conservative','Conservative'), ...]
+    asisa_choices        = Client.RISK_TOLERANCE  # e.g. [('(ASISA) South African MA Income', ...), ...]
+
+    if request.method == 'POST':
+        name          = request.POST.get('name', '').strip()
+        client_group  = request.POST.get('client_group', '').strip()
+        risk_profile  = request.POST.get('risk_profile', '').strip()
+        fund_category = request.POST.get('fund_category', '').strip()
+        total_value   = request.POST.get('total_value', '').strip()
+
+        # Server-side validation
+        errors = {}
+        if not name:
+            errors['name'] = 'Portfolio name is required.'
+        if not client_group:
+            errors['client_group'] = 'Please select a company.'
+        if not risk_profile:
+            errors['risk_profile'] = 'Please select a risk profile.'
+        if not fund_category:
+            errors['fund_category'] = 'Please select an ASISA category.'
+
+        # Check for duplicate name within the same group
+        if name and client_group and Portfolio.objects.filter(
+            name__iexact=name,
+            risk_profile__iexact=risk_profile,
+            client_group__iexact=client_group,
+        ).exists():
+            errors['name'] = f'A portfolio called "{name}" already exists for {client_group}.'
+
+        if errors:
+            return render(request, 'create_portfolio.html', {
+                'advisor':              advisor,
+                'risk_profile_choices': risk_profile_choices,
+                'asisa_choices':        asisa_choices,
+                'group_choices':        CLIENT_GROUP_CHOICES,
+                'error':                'Please fix the errors below.',
+                'form_data':            request.POST,
+            })
+
+        # Parse optional total_value
+        parsed_value = None
+        if total_value:
+            try:
+                parsed_value = float(total_value)
+            except ValueError:
+                parsed_value = None
+
+        # Save directly to the database
+        Portfolio.objects.create(
+            name=name,
+            client_group=client_group,
+            risk_profile=risk_profile,
+            fund_category=fund_category,
+            total_value=parsed_value if parsed_value is not None else 0,
+        )
+
+        messages.success(request, f'Portfolio "{name}" created successfully.')
+        return redirect('portfolio_list')
+
+    # GET request — render the blank form
+    return render(request, 'create_portfolio.html', {
+        'advisor':              advisor,
+        'risk_profile_choices': risk_profile_choices,
+        'asisa_choices':        asisa_choices,
+        'group_choices':        CLIENT_GROUP_CHOICES,
+        'form_data':            {},
+    })
 
 def about(request):
     return render(request, 'about.html')

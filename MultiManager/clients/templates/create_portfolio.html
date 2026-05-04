@@ -1,0 +1,360 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<style>
+    .cp-wrap {
+        max-width: 680px;
+        margin: 48px auto 60px;
+    }
+
+    .cp-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #64748b;
+        text-decoration: none;
+        margin-bottom: 28px;
+        transition: color .15s;
+    }
+
+    .cp-back:hover {
+        color: #2ec4b6;
+    }
+
+    .cp-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: #2ec4b6;
+        margin-bottom: 6px;
+    }
+
+    .cp-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin: 0 0 6px;
+    }
+
+    .cp-sub {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0 0 32px;
+    }
+
+    /* Override base form styles for this page */
+    .cp-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, .07);
+        padding: 36px 40px;
+    }
+
+    .cp-card form {
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .field-group {
+        margin-bottom: 22px;
+    }
+
+    .field-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 7px;
+    }
+
+    .field-group label span.req {
+        color: #2ec4b6;
+        margin-left: 2px;
+    }
+
+    .field-hint {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 400;
+        margin-left: 6px;
+    }
+
+    .cp-card input[type="text"],
+    .cp-card input[type="number"],
+    .cp-card select {
+        width: 100%;
+        padding: 11px 14px;
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        font-size: 14px;
+        color: #1a1a1a;
+        background: #fff;
+        outline: none;
+        transition: border .2s, box-shadow .2s;
+        box-sizing: border-box;
+        margin-bottom: 0;
+    }
+
+    .cp-card input[type="text"]:focus,
+    .cp-card input[type="number"]:focus,
+    .cp-card select:focus {
+        border-color: #2ec4b6;
+        box-shadow: 0 0 0 3px rgba(46, 196, 182, .12);
+    }
+
+    .cp-card select option[value=""] {
+        color: #94a3b8;
+    }
+
+    .divider {
+        border: none;
+        border-top: 1.5px solid #f1f5f9;
+        margin: 28px 0;
+    }
+
+    .field-row {
+        display: flex;
+        gap: 16px;
+    }
+
+    .field-row .field-group {
+        flex: 1;
+    }
+
+    /* Preview badge */
+    .preview-area {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-bottom: 24px;
+        border: 1.5px dashed #e2e8f0;
+    }
+
+    .preview-area p {
+        font-size: 12px;
+        color: #94a3b8;
+        margin: 0 0 10px;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        font-weight: 700;
+    }
+
+    .preview-inner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .preview-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .preview-rp {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 100px;
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .preview-group {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 6px;
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    /* Submit */
+    .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: #2ec4b6;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .2s, transform .15s;
+        letter-spacing: .01em;
+    }
+
+    .btn-submit:hover {
+        background: #1a1a1a;
+        transform: translateY(-1px);
+    }
+
+    /* Error */
+    .field-error {
+        font-size: 12px;
+        color: #dc2626;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .has-error input,
+    .has-error select {
+        border-color: #dc2626 !important;
+    }
+
+    .has-error .field-error {
+        display: block;
+    }
+
+    /* Global error banner */
+    .error-banner {
+        background: #fce7e7;
+        color: #b91c1c;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="cp-wrap">
+    <a href="{% url 'portfolio_list' %}" class="cp-back">← Back to Portfolio List</a>
+
+    <div class="cp-eyebrow">Advisor Portal</div>
+    <h1 class="cp-title">Create New Portfolio</h1>
+    <p class="cp-sub">This portfolio will be saved immediately and appear at the top of your Portfolio List.</p>
+
+    {% if error %}
+    <div class="error-banner">{{ error }}</div>
+    {% endif %}
+
+    <div class="cp-card">
+        <form method="POST" action="{% url 'create_portfolio' %}" id="cp-form">
+            {% csrf_token %}
+
+            <!-- Portfolio Name -->
+            <div class="field-group" id="fg-name">
+                <label for="name">Portfolio Name <span class="req">*</span></label>
+                <input type="text" id="name" name="name" placeholder="e.g. Balanced Growth Portfolio"
+                    value="{{ form_data.name|default:'' }}" autocomplete="off">
+                <div class="field-error">Portfolio name is required.</div>
+            </div>
+
+            <!-- Company name -->
+            <div class="field-group" id="fg-company">
+                <label for="client_group">Company / Client Group <span class="req">*</span>
+                    <span class="field-hint">Who this portfolio belongs to</span>
+                </label>
+                <select id="client_group" name="client_group">
+                    <option value="">— Select company —</option>
+                    {% for val, label in group_choices %}
+                    <option value="{{ val }}" {% if form_data.client_group == val %}selected{% endif %}>{{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <div class="field-error">Please select a company.</div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Risk Profile + ASISA category side by side -->
+            <div class="field-row">
+                <div class="field-group" id="fg-risk-profile">
+                    <label for="risk_profile">Risk Profile <span class="req">*</span></label>
+                    <select id="risk_profile" name="risk_profile">
+                        <option value="">— Select risk profile —</option>
+                        {% for val, label in risk_profile_choices %}
+                        <option value="{{ val }}" {% if form_data.risk_profile == val %}selected{% endif %}>{{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="field-error">Please select a risk profile.</div>
+                </div>
+
+                <div class="field-group" id="fg-fund-category">
+                    <label for="fund_category">ASISA Category <span class="req">*</span></label>
+                    <select id="fund_category" name="fund_category">
+                        <option value="">— Select ASISA category —</option>
+                        {% for val, label in asisa_choices %}
+                        <option value="{{ val }}" {% if form_data.fund_category == val %}selected{% endif %}>{{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="field-error">Please select an ASISA category.</div>
+                </div>
+            </div>
+
+            <!-- Total value (optional) -->
+            <div class="field-group">
+                <label for="total_value">Total Value (ZAR) <span class="field-hint">Optional — leave blank if
+                        unknown</span></label>
+                <input type="number" id="total_value" name="total_value" placeholder="e.g. 5000000" min="0" step="0.01"
+                    value="{{ form_data.total_value|default:'' }}">
+            </div>
+
+            <hr class="divider">
+
+            <!-- Live preview -->
+            <div class="preview-area" id="preview-area" style="display:none;">
+                <p>Preview</p>
+                <div class="preview-inner">
+                    <span class="preview-name" id="prev-name">—</span>
+                    <span class="preview-rp" id="prev-rp">—</span>
+                    <span class="preview-group" id="prev-group">—</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Save Portfolio →</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ── Live preview ──────────────────────────────────────────────────
+    function updatePreview() {
+        const name = document.getElementById('name').value.trim();
+        const rp = document.getElementById('risk_profile');
+        const grp = document.getElementById('client_group');
+        const area = document.getElementById('preview-area');
+
+        if (!name && !rp.value && !grp.value) { area.style.display = 'none'; return; }
+        area.style.display = 'block';
+        document.getElementById('prev-name').textContent = name || '(unnamed)';
+        document.getElementById('prev-rp').textContent = rp.options[rp.selectedIndex]?.text || '—';
+        document.getElementById('prev-group').textContent = grp.options[grp.selectedIndex]?.text || '—';
+    }
+
+    ['name', 'risk_profile', 'client_group', 'fund_category'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updatePreview);
+        if (el) el.addEventListener('change', updatePreview);
+    });
+
+    // ── Client-side validation ────────────────────────────────────────
+    document.getElementById('cp-form').addEventListener('submit', function (e) {
+        let valid = true;
+        const required = [
+            { id: 'name', fg: 'fg-name' },
+            { id: 'client_group', fg: 'fg-company' },
+            { id: 'risk_profile', fg: 'fg-risk-profile' },
+            { id: 'fund_category', fg: 'fg-fund-category' },
+        ];
+        required.forEach(({ id, fg }) => {
+            const el = document.getElementById(id);
+            const grp = document.getElementById(fg);
+            if (!el.value.trim()) {
+                grp.classList.add('has-error');
+                valid = false;
+            } else {
+                grp.classList.remove('has-error');
+            }
+        });
+        if (!valid) e.preventDefault();
+    });
+</script>
+{% endblock %}
