@@ -195,8 +195,12 @@
 <!-- Stats -->
 <div class="stat-row">
     <div class="stat-card">
-        <h4>Total Clients</h4>
-        <h2>{{ clients|length }}</h2>
+        <h4>Active Clients</h4>
+        <h2>{{ active_clients|length }}</h2>
+    </div>
+    <div class="stat-card">
+        <h4>In Progress</h4>
+        <h2>{{ draft_clients|length }}</h2>
     </div>
     <div class="stat-card">
         <h4>Business Group</h4>
@@ -214,7 +218,52 @@
     <a href="{% url 'create_client' %}" class="btn-teal">+ Add New Client</a>
 </div>
 
-{% if clients %}
+<!-- ── DRAFT clients ── -->
+{% if draft_clients %}
+<h3
+    style="margin:32px 0 12px;font-size:14px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.08em;">
+    🔄 In Progress ({{ draft_clients|length }})
+</h3>
+<table class="client-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Saved Goal</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in draft_clients %}
+        <tr>
+            <td>
+                <strong>{{ c.name }}</strong>
+                {% if c.questionnaire_status == 'DRAFT' %}
+                <span
+                    style="margin-left:6px;padding:2px 8px;background:#fef9c3;color:#92400e;border-radius:6px;font-size:11px;font-weight:700;">DRAFT</span>
+                {% else %}
+                <span
+                    style="margin-left:6px;padding:2px 8px;background:#dbeafe;color:#1d4ed8;border-radius:6px;font-size:11px;font-weight:700;">ONGOING</span>
+                {% endif %}
+            </td>
+            <td>{{ c.age }}</td>
+            <td>{{ c.investment_goal|default:"—" }}</td>
+            <td>
+                <a href="{% url 'resume_client' c.id %}" class="btn-teal"
+                    style="padding:6px 14px;font-size:12px;">Resume</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<!-- ── ACTIVE clients ── -->
+<h3
+    style="margin:32px 0 12px;font-size:14px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:.08em;">
+    ✓ Active Clients — Portfolio Chosen ({{ active_clients|length }})
+</h3>
+{% if active_clients %}
 <table class="client-table">
     <thead>
         <tr>
@@ -228,8 +277,8 @@
         </tr>
     </thead>
     <tbody>
-        {% for c in clients %}
-        <tr style="cursor:pointer;" onclick="this.querySelector('a').click();">
+        {% for c in active_clients %}
+        <tr style="cursor:pointer;" onclick="this.querySelector('a.view-link').click();">
             <td><strong>{{ c.name }}</strong></td>
             <td>{{ c.age }}</td>
             <td>
@@ -238,28 +287,25 @@
             {% elif 'Conservative' in c.risk_profile %}conservative
             {% elif 'Cautious' in c.risk_profile %}cautious
             {% elif 'Moderate' in c.risk_profile %}moderate
-            {% endif %}">
-                    {{ c.risk_profile|default:"—" }}
-                </span>
+            {% endif %}">{{ c.risk_profile|default:"—" }}</span>
             </td>
             <td style="font-size:12px;">{{ c.risk_tolerance|default:"—" }}</td>
             <td>{{ c.time_horizon }}y</td>
             <td>{{ c.investment_goal|default:"—" }}</td>
-            <td onclick="event.stopPropagation()">
-                <a href="{% url 'client_detail' c.id %}" class="btn-teal" style="padding:6px 14px;font-size:12px;">View</a>
+            <td onclick="event.stopPropagation();" style="display:flex;gap:6px;">
+                <a href="{% url 'client_detail' c.id %}" class="btn-teal view-link"
+                    style="padding:6px 14px;font-size:12px;">View</a>
+                <td onclick="event.stopPropagation();">
+                    <a href="{% url 'client_detail' c.id %}" class="btn-teal view-link"
+                        style="padding:6px 14px;font-size:12px;">View</a>
+                </td>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% else %}
-<div class="empty-state">
-    <div class="icon">👥</div>
-    <h3>No clients yet</h3>
-    <p>Start by adding your first client. Their group will be set automatically to <strong>{{ advisor.business_group
-            }}</strong>.</p>
-    <a href="{% url 'create_client' %}" class="btn-teal">+ Add First Client</a>
-</div>
+<p style="color:#94a3b8;font-size:14px;">No active clients yet.</p>
 {% endif %}
 
 {% endblock %}

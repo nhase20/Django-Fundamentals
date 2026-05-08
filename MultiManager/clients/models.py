@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 from django.db import models
 from .automations import retail_benchmark_selector,retail_asset_allocation
 
+CLIENT_JOURNEY = [
+    ('not started','NOT_STARTED'),
+    ('on-track','ON-TRACK'),
+    ('complete','COMLPETE'),
+]
 
 CLIENT_GROUP_CHOICES = [
         ('ACS','ACS'),
@@ -41,13 +46,9 @@ CLIENT_GROUP_CHOICES = [
         ('Zingitwa Wealth','Zingitwa Wealth'),
         ('Other','Other'),
     ]
-
-# Retail Client data
-class Client(models.Model):
-
-    # How much risk the business is willing to take
-    # AFTER — stored values now exactly match Portfolio.risk_profile values from CSV
-    RISK_PROFILE = [
+# How much risk the business is willing to take
+# AFTER — stored values now exactly match Portfolio.risk_profile values from CSV
+RISK_PROFILE = [
         ('Conservative', 'Conservative'),
         ('Aggressive', 'Aggressive'),
         ('Moderate', 'Moderate'),
@@ -58,10 +59,10 @@ class Client(models.Model):
         ('Global Cautious', 'Global Cautious'),
         ('Global Conservative', 'Global Conservative'),
         ('Cautious', 'Cautious'),
-    ]
+]
 
-    # AFTER — stored values match Portfolio.fund_category values from CSV exactly
-    RISK_TOLERANCE = [
+# AFTER — stored values match Portfolio.fund_category values from CSV exactly
+RISK_TOLERANCE = [
         ('(ASISA) South African MA Income', '(ASISA) South African MA Income'),
         ('(ASISA) South African MA Low Equity', '(ASISA) South African MA Low Equity'),
         ('(ASISA) South African MA Medium Equity', '(ASISA) South African MA Medium Equity'),
@@ -72,16 +73,25 @@ class Client(models.Model):
         ('EAA Fund USD Aggressive Allocation', 'EAA Fund USD Aggressive Allocation'),
         ('EAA Fund USD Diversified Bond - Short Term', 'EAA Fund USD Diversified Bond - Short Term'),
         ('SA Equity', 'SA Equity'),  # CSV has a trailing space 
-    ]
+]
 
-    RISK_RATING = [
+RISK_RATING = [
         ('low', 'Low'),
         ('pure equity', 'Pure Equity'),
         ("low-medium", 'Low-Medium'),
         ('medium', 'Medium'),
         ("high", 'High'),
         ('flexible','Flexible'),
-    ]
+]
+QUESTIONNAIRE_STATUS = [
+    ('DRAFT', 'Draft'),
+    ('ONGOING', 'Ongoing'),    
+    ('ACTIVE', 'Active'),
+]
+
+# Client data
+class Client(models.Model):
+
     # user instance which has a one-to-one reltionship with profile 
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     # A few details that can be used to create a suggestion to the user and create a custom dashboard
@@ -94,6 +104,42 @@ class Client(models.Model):
     risk_profile = models.CharField(choices=RISK_PROFILE,blank=True)
     client_group = models.CharField(choices=CLIENT_GROUP_CHOICES,default="other",blank=True)
     advisor = models.ForeignKey('Advisor', null=True, blank=True, on_delete=models.SET_NULL)
+    journey = models.CharField(choices=CLIENT_JOURNEY,blank = True)
+    questionnaire_status = models.CharField(
+        choices=QUESTIONNAIRE_STATUS,
+        default='FINAL',
+        max_length=10,
+    )
+
+    total_investable_assets = models.DecimalField(
+        max_digits=14, decimal_places=2, null=True, blank=True,
+        help_text="Total rand value of all investable assets"
+    )
+    monthly_surplus = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="Monthly income minus monthly expenses (disposable surplus)"
+    )
+    has_liabilities = models.BooleanField(
+        null=True, blank=True,
+        help_text="Does the client have significant debt (home loan, credit, vehicle finance)?"
+    )
+    financial_goal_amount = models.DecimalField(
+        max_digits=14, decimal_places=2, null=True, blank=True,
+        help_text="Target rand amount the client wants to reach"
+    )
+    number_of_dependants = models.PositiveSmallIntegerField(
+        null=True, blank=True,
+        help_text="Number of people financially dependent on the client"
+    )
+    questionnaire_status = models.CharField(
+        choices=QUESTIONNAIRE_STATUS,
+        default='ONGOING',
+        max_length=10,
+    )
+    questionnaire_step = models.PositiveSmallIntegerField(
+        default=1,
+        help_text="Last step the advisor reached in the questionnaire (1–7)"
+    )
     # @property
     def benchmark(self):
         return retail_benchmark_selector(self)

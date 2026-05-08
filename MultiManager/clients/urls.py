@@ -3,8 +3,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('',                              views.home,              name='home'),
     path('logout/',                       views.logout_view,       name='logout'),
+    path('',                              views.home,              name='home'),
     path('register/advisor/',             views.register_advisor,  name='register_advisor'),
     path('about/',                        views.about,             name='about'),
     path('dashboard/',                    views.dashboard,         name='dashboard'),
@@ -13,8 +13,10 @@ urlpatterns = [
     path('create-client/',                views.create_client,     name='create_client'),
     path('client/<int:client_id>/',       views.client_detail,     name='client_detail'),
     path('client/<int:client_id>/edit/',  views.edit_client,       name='edit_client'),
-    path('client/<int:client_id>/portfolio/', views.add_portfolio,     name='add_portfolio'),
+    path('client/<int:client_id>/portfolio/', views.add_portfolio, name='add_portfolio'),
     path('results/<int:client_id>/',      views.portfolio_results, name='portfolio_results'),
-    path('advisor/portfolios/', views.portfolio_list, name='portfolio_list'),
-    path('advisor/portfolios/create/', views.create_portfolio, name='create_portfolio'),
+    path('advisor/portfolios/',           views.portfolio_list,    name='portfolio_list'),
+    path('advisor/portfolios/create/',    views.create_portfolio,  name='create_portfolio'),
+    path('client/<int:client_id>/complete/', views.mark_completed, name='mark_completed'),
+    path('client/<int:client_id>/resume/', views.resume_client,    name='resume_client'),
 ]

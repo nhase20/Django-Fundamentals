@@ -301,7 +301,7 @@ def generate_client_insights(client):
     }
 
 
-# ── Legacy helpers kept for backwards compatibility ──
+# Legacy helpers for backwards compatibility 
 
 def retail_benchmark_selector(client):
     return generate_client_insights(client)["benchmark"]
@@ -323,7 +323,7 @@ def classify_retailer(client):
     return "Aggressive"
 
 RISK_SCORE_MAP = {
-    # Maps total score → risk profile label
+    # Mapping total score → risk profile label
     (0, 3):   'Conservative',
     (4, 6):   'Cautious',
     (7, 9):   'Moderate',
@@ -340,17 +340,25 @@ ASISA_MAP = {
 }
 
 def calculate_risk_profile(answers: dict) -> tuple[str, str]:
-    """
-    answers keys: purpose, time_horizon, emergency_fund, 
-                  volatility_comfort, income_or_growth
-    Returns: (risk_profile_label, asisa_category)
-    """
     score = 0
     score += {'retirement': 1, 'education': 2, 'wealth': 3}   .get(answers.get('purpose'), 2)
     score += {'short': 1, 'medium': 2, 'long': 3}             .get(answers.get('time_horizon'), 2)
     score += {'no': 0, 'yes': 1}                               .get(answers.get('emergency_fund'), 0)
     score += {'low': 1, 'medium': 2, 'high': 3}               .get(answers.get('volatility_comfort'), 1)
     score += {'income': 1, 'balanced': 2, 'growth': 3}        .get(answers.get('income_or_growth'), 2)
+
+    # Knowledge penalty: a client with no/limited knowledge cannot be placed in aggressive
+    knowledge = answers.get('investment_knowledge', 'fair')
+    if knowledge in ('none', 'limited'):
+        score = min(score, 9)   # caps at Moderate — cannot reach Moderate Aggressive or Aggressive
+
+    # Income penalty: no income source means risk capacity is reduced
+    if answers.get('has_income') == 'no':
+        score = max(score - 2, 0)
+
+    # If client doesn't understand risk/return, cap at Cautious
+    if answers.get('risk_return_aware') == 'no':
+        score = min(score, 6)
 
     for (lo, hi), label in RISK_SCORE_MAP.items():
         if lo <= score <= hi:

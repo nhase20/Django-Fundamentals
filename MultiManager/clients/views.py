@@ -11,7 +11,6 @@ from .automations import dynamic_asset_allocation, generate_client_insights, cal
 import json
 
 
-# ── Login ──────────────────────────────────────────────────────────────────────
 def home(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -20,7 +19,7 @@ def home(request):
         if user is not None:
             login(request, user)
             if hasattr(user, 'advisor'):
-                return redirect('admin_overview')
+                return redirect('dashboard')
             elif user.is_staff:
                 return redirect('admin_overview')
             else:
@@ -29,13 +28,11 @@ def home(request):
     return render(request, "login.html")
 
 
-# ── Logout ─────────────────────────────────────────────────────────────────────
 def logout_view(request):
     logout(request)
     return redirect('home')
 
 
-# ── Advisor registration ────────────────────────────────────────────────────────
 def register_advisor(request):
     if request.method == "POST":
         first_name     = request.POST.get("first_name", "").strip()
@@ -85,7 +82,6 @@ def register_advisor(request):
     })
 
 
-# ── Advisor: create a client ────────────────────────────────────────────────────
 @login_required
 def create_client(request):
     if not hasattr(request.user, 'advisor'):
@@ -94,11 +90,60 @@ def create_client(request):
     advisor = request.user.advisor
 
     if request.method == 'POST':
+        action = request.POST.get('action', 'active')  # 'draft' or 'active'
+
+        def safe_int(val, default=0):
+            try: return int(val)
+            except (ValueError, TypeError): return default
+
+        def safe_decimal(val):
+            try:
+                from decimal import Decimal
+                return Decimal(str(val)) if val else None
+            except Exception: return None
+
+        if action == 'draft':
+            name = request.POST.get('name', '').strip()
+            if not name:
+                messages.error(request, 'Please enter a client name before saving a draft.')
+                return render(request, 'questionnaire.html', {
+                    'form': ClientQuestionnaireForm(request.POST),
+                    'advisor': advisor,
+                })
+
+            horizon_map = {'short': 3, 'medium': 7, 'long': 15}
+            has_liabilities_raw = request.POST.get('has_liabilities', '')
+
+            client = Client.objects.create(
+                name=name,
+                age=safe_int(request.POST.get('age'), 18),
+                investment_goal=request.POST.get('purpose', 'None') or 'None',
+                time_horizon=horizon_map.get(request.POST.get('time_horizon', ''), 7),
+                questionnaire_status='DRAFT',
+                questionnaire_step=int(request.POST.get('current_step', 1)),
+                client_group=advisor.business_group,
+                advisor=advisor,
+                risk_profile='',
+                risk_tolerance='',
+                risk_rating='medium',
+                # financial fields — save whatever is present
+                total_investable_assets=safe_decimal(request.POST.get('total_investable_assets')),
+                monthly_surplus=safe_decimal(request.POST.get('monthly_surplus')),
+                financial_goal_amount=safe_decimal(request.POST.get('financial_goal_amount')),
+                has_liabilities=True if has_liabilities_raw == 'yes' else (False if has_liabilities_raw == 'no' else None),
+                number_of_dependants=safe_int(request.POST.get('number_of_dependants'), None) if request.POST.get('number_of_dependants') else None,
+            )
+            messages.success(request, f'Draft saved for {client.name}. You can complete this later from the dashboard.')
+            return redirect('advisor_dashboard')
+
+        # action == 'active' — full validation
         form = ClientQuestionnaireForm(request.POST)
         if form.is_valid():
             answers = form.cleaned_data
+            from .automations import calculate_risk_profile
             risk_profile, asisa_category = calculate_risk_profile(answers)
 
+            has_liabilities_val = answers.get('has_liabilities')
             client = Client.objects.create(
                 name=answers['name'],
                 age=answers['age'],
@@ -109,16 +154,23 @@ def create_client(request):
                 risk_profile=risk_profile,
                 risk_tolerance=asisa_category,
                 risk_rating='medium',
+                questionnaire_status='ONGOING',
+                total_investable_assets=answers.get('total_investable_assets'),
+                monthly_surplus=answers.get('monthly_surplus'),
+                financial_goal_amount=answers.get('financial_goal_amount'),
+                has_liabilities=True if has_liabilities_val == 'yes' else (False if has_liabilities_val == 'no' else None),
+                number_of_dependants=answers.get('number_of_dependants'),
             )
-
             return redirect('portfolio_results', client_id=client.id)
-    else:
-        form = ClientQuestionnaireForm()
+        else:
+            return render(request, 'questionnaire.html', {'form': form, 'advisor': advisor})
 
-    return render(request, 'questionnaire.html', {'form': form, 'advisor': advisor})
+    return render(request, 'questionnaire.html', {
+        'form': ClientQuestionnaireForm(),
+        'advisor': advisor,
+    })
 
 
-# ── Advisor dashboard ───────────────────────────────────────────────────────────
 @login_required
 def advisor_dashboard(request):
     if not hasattr(request.user, 'advisor'):
@@ -127,11 +179,17 @@ def advisor_dashboard(request):
         return redirect('admin_overview')
     
     advisor = request.user.advisor
-    clients = Client.objects.filter(advisor=advisor).order_by('name')
+    draft_clients   = Client.objects.filter(
+        advisor=advisor, questionnaire_status__in=['DRAFT', 'ONGOING']
+    ).order_by('name')
+    active_clients    = Client.objects.filter(advisor=advisor, questionnaire_status='ACTIVE').order_by('name')
+    
 
     return render(request, 'dashboard.html', {
         'advisor': advisor,
-        'clients': clients,
+        'draft_clients':     draft_clients,
+        'active_clients':    active_clients,
+        'clients': active_clients,
     })
 
 
@@ -142,6 +200,13 @@ def client_detail(request, client_id):
     client = get_object_or_404(Client, id=client_id)
     if hasattr(request.user, 'advisor') and client.advisor != request.user.advisor:
         return redirect('advisor_dashboard')
+    
+    if client.questionnaire_status == 'DRAFT':
+        messages.warning(
+            request,
+            f'{client.name} is an incomplete draft. Please complete the questionnaire first.'
+        )
+        return redirect('resume_client', client_id=client.id)
 
     allocation = dynamic_asset_allocation(client)
 
@@ -168,7 +233,6 @@ def client_detail(request, client_id):
         "explanation": raw_insights["scenario"]["description"] +" -- {"+raw_insights["scenario"]["return_range"]+"}"
     },
 ]
-    # print("Scenario: ",raw_insights["scenario"])
 
     assigned_portfolios = Portfolio.objects.filter(client=client)
 
@@ -250,9 +314,10 @@ def add_portfolio(request, client_id):
                 Portfolio.objects.filter(client=client).update(client=None)
                 portfolio.client = client
                 portfolio.save()
+                client.questionnaire_status = 'ACTIVE'
+                client.save(update_fields=['questionnaire_status'])
             except Portfolio.DoesNotExist:
                 pass
-        print('Das Goodt')
         return redirect('client_detail', client_id=client.id)
     
     print('Passed stage')
@@ -279,7 +344,6 @@ def add_portfolio(request, client_id):
     })
 
 
-# ── Client dashboard ────────────────────────────────────────────────────────────
 @login_required
 def dashboard(request):
     if hasattr(request.user, 'advisor'):
@@ -303,10 +367,9 @@ def dashboard(request):
     })
 
 
-# ── Portfolio results ───────────────────────────────────────────────────────────
 @login_required
 def portfolio_results(request, client_id):
-    client = get_object_or_404(id=client_id)
+    client = get_object_or_404(Client,id=client_id)
 
     group_portfolios = Portfolio.objects.filter(
         client_group__iexact=client.client_group,
@@ -509,3 +572,115 @@ def create_portfolio(request):
 
 def about(request):
     return render(request, 'about.html')
+
+@login_required
+def mark_completed(request, client_id):
+    """Mark a FINAL/ACTIVE client as COMPLETED (filed away)."""
+    if not hasattr(request.user, 'advisor'):
+        return redirect('dashboard')
+    client = get_object_or_404(Client, id=client_id)
+    if client.advisor != request.user.advisor:
+        return redirect('advisor_dashboard')
+
+    if request.method == 'POST':
+        client.questionnaire_status = 'COMPLETED'
+        client.save()
+        messages.success(request, f'{client.name} has been marked as completed.')
+    return redirect('advisor_dashboard')
+
+
+@login_required
+def resume_client(request, client_id):
+    """Resume filling in a DRAFT client's questionnaire."""
+    if not hasattr(request.user, 'advisor'):
+        return redirect('dashboard')
+    client = get_object_or_404(Client, id=client_id)
+    if client.advisor != request.user.advisor:
+        return redirect('advisor_dashboard')
+
+    if client.questionnaire_status != 'DRAFT':
+        return redirect('client_detail', client_id=client.id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action', 'active')
+
+        def safe_decimal(val):
+            try:
+                from decimal import Decimal
+                return Decimal(str(val)) if val else None
+            except Exception: return None
+
+        horizon_map = {'short': 3, 'medium': 7, 'long': 15}
+
+        if action == 'draft':
+            # Save progress again, stay DRAFT
+            has_liabilities_raw = request.POST.get('has_liabilities', '')
+            client.name = request.POST.get('name', client.name).strip() or client.name
+            client.age = int(request.POST.get('age', client.age) or client.age)
+            client.investment_goal = request.POST.get('purpose', client.investment_goal) or client.investment_goal
+            client.time_horizon = horizon_map.get(request.POST.get('time_horizon', ''), client.time_horizon)
+            client.total_investable_assets = safe_decimal(request.POST.get('total_investable_assets')) or client.total_investable_assets
+            client.monthly_surplus = safe_decimal(request.POST.get('monthly_surplus')) or client.monthly_surplus
+            client.financial_goal_amount = safe_decimal(request.POST.get('financial_goal_amount')) or client.financial_goal_amount
+            if has_liabilities_raw == 'yes': client.has_liabilities = True
+            elif has_liabilities_raw == 'no': client.has_liabilities = False
+            dep = request.POST.get('number_of_dependants', '')
+            if dep: client.number_of_dependants = int(dep)
+            step_val = request.POST.get('current_step', '')
+            if step_val:
+                client.questionnaire_step = int(step_val)
+            client.save()
+            messages.success(request, f'Draft updated for {client.name}.')
+            return redirect('advisor_dashboard')
+
+        # action == 'active' — full validation, finalise
+        form = ClientQuestionnaireForm(request.POST)
+        if form.is_valid():
+            answers = form.cleaned_data
+            from .automations import calculate_risk_profile
+            risk_profile, asisa_category = calculate_risk_profile(answers)
+            has_liabilities_val = answers.get('has_liabilities')
+
+            client.name = answers['name']
+            client.age = answers['age']
+            client.investment_goal = answers['purpose']
+            client.time_horizon = horizon_map[answers['time_horizon']]
+            client.risk_profile = risk_profile
+            client.risk_tolerance = asisa_category
+            client.risk_rating = 'medium'
+            client.questionnaire_status = 'ONGOING'
+            client.total_investable_assets = answers.get('total_investable_assets')
+            client.monthly_surplus = answers.get('monthly_surplus')
+            client.financial_goal_amount = answers.get('financial_goal_amount')
+            client.has_liabilities = True if has_liabilities_val == 'yes' else (False if has_liabilities_val == 'no' else None)
+            client.number_of_dependants = answers.get('number_of_dependants')
+            client.save()
+            return redirect('portfolio_results', client_id=client.id)
+        else:
+            return render(request, 'questionnaire.html', {
+                'form': form,
+                'advisor': request.user.advisor,
+                'resuming_client': client,
+            })
+
+    # GET — pre-fill the form with whatever the draft has
+    initial = {
+        'name': client.name,
+        'age': client.age,
+        'purpose': client.investment_goal,
+        'total_investable_assets': str(client.total_investable_assets) if client.total_investable_assets is not None else '',
+        'monthly_surplus': str(client.monthly_surplus) if client.monthly_surplus is not None else '',
+        'financial_goal_amount': str(client.financial_goal_amount) if client.financial_goal_amount is not None else '',
+        'number_of_dependants': str(client.number_of_dependants) if client.number_of_dependants is not None else '',
+        'has_liabilities': 'yes' if client.has_liabilities else ('no' if client.has_liabilities is False else ''),
+        # Radio fields that map from model storage back to questionnaire values
+        'time_horizon': {3: 'short', 7: 'medium', 15: 'long'}.get(client.time_horizon, ''),
+    }
+    form = ClientQuestionnaireForm(initial=initial)
+    return render(request, 'questionnaire.html', {
+        'form': form,
+        'advisor': request.user.advisor,
+        'resuming_client': client,
+        'initial_data': json.dumps(initial),
+        'initial_step': client.questionnaire_step,
+    })
